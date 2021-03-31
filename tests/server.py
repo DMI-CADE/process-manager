@@ -17,16 +17,18 @@ serversocket.listen(1)
 while True:
     clientsocket, addr = serversocket.accept()
 
-    print('Connected: %s, %s' % (str(clientsocket), str(addr)))
+    print('Connected: ', str(addr), str(clientsocket))
 
-    msg = 'Message from Python Script...'
+    print('Receiving Msg...')
+    recMsg = clientsocket.recv(1024)
+    print('[Received Message]', recMsg.decode('ascii'))
+
+    msg = ''
     while msg != 'exit':
         print(msg != 'exit')
         msg = input("Send: ")
-        clientsocket.send(msg.encode('ascii'))
-
-    # recMsg = clientsocket.recv(1024)
-    # print('[Received Message]', recMsg.decode('ascii'))
+        bytesSent = clientsocket.send(msg.encode('ascii'))
+        print("bytesSent:", bytesSent)
 
     clientsocket.close()
     break
