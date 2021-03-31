@@ -13,4 +13,4 @@ class WindowHandler:
         mtp3 = 'echo test_lmao'.split()
         cp = subprocess.run(mtp2, capture_output=True, shell=True)
         print(cp)
-        print('done :))
+        print('done :)')
