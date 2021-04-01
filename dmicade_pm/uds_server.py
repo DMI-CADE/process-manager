@@ -38,7 +38,7 @@ class UdsServer:
         print('[Received Message]', rec_msg.decode('ascii'))
 
     def _is_connected(self):
-        return _client_conn != None
+        return self._client_conn != None
 
 
 #serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
