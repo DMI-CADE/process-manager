@@ -1,6 +1,8 @@
 import socket
 import os, os.path
 
+# TESTING STATE
+
 serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
 socketPath = '/tmp/dmicade_socket.s'
