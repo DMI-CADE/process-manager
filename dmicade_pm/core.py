@@ -1,4 +1,4 @@
-import window_handler
+import uds_server, window_handler
 
 class ProjectManager:
 
@@ -6,8 +6,13 @@ class ProjectManager:
         pass
 
     def start(self):
-        win_handler = window_handler.WindowHandler()
-        win_handler.start()
+        socket_path = '/tmp/dmicade_socket.s'
+        server = uds_server.UdsServer(socket_path)
 
-pm = ProjectManager()
-pm.start()
+        #win_handler = window_handler.WindowHandler()
+        #win_handler.start()
+
+
+if __name__ == '__main__':
+    pm = ProjectManager()
+    pm.start()

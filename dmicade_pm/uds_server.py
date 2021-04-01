@@ -3,34 +3,74 @@ import os, os.path
 
 # TESTING STATE
 
-serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+class UdsServer:
+    """Unix Domain Socket Server for dmicade process manager."""
 
-socketPath = '/tmp/dmicade_socket.s'
+    _server_socket = None
+    _socket_path = ""
+    _client_socket = None
 
-if os.path.exists(socketPath):
-    os.remove(socketPath)
+    def __init__(self, socket_path):
+        self._socket_path = socket_path
 
-print('Bind:', socketPath)
-serversocket.bind(socketPath)
+    def start(self):
+        self._server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
-print('Listening for connection...')
-serversocket.listen(1)
+        if os.path.exists(self._socket_path):
+            os.remove(self._socket_path)
 
-while True:
-    clientsocket, addr = serversocket.accept()
+        self._server_socket.bind(self._socket_path)
 
-    print('Connected: ', str(addr), str(clientsocket))
+        self._server_socket.listen(1)
+        clientsocket, addr = self._server_socket.accept()
 
-    print('Receiving Msg...')
-    recMsg = clientsocket.recv(1024)
-    print('[Received Message]', recMsg.decode('ascii'))
+    def send(self, message):
+        bytes_sent = clientsocket.send(message.encode('ascii'))
+        print('bytesSent:', bytes_sent)
 
-    msg = ''
-    while msg != 'exit':
-        print(msg != 'exit')
-        msg = input("Send: ")
-        bytesSent = clientsocket.send(msg.encode('ascii'))
-        print("bytesSent:", bytesSent)
+    def disconnect(self):
+        pass
 
-    clientsocket.close()
-    break
+    def _connect(self):
+        pass
+
+    def _receive_msg(self):
+        print('Receiving Msg...')
+        recMsg = clientsocket.recv(1024)
+        print('[Received Message]', recMsg.decode('ascii'))
+
+    def _is_connected(self):
+        return _client_socket != None
+
+
+#serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+#
+#socketPath = '/tmp/dmicade_socket.s'
+#
+#if os.path.exists(socketPath):
+#    os.remove(socketPath)
+#
+#print('Bind:', socketPath)
+#serversocket.bind(socketPath)
+#
+#print('Listening for connection...')
+#serversocket.listen(1)
+#
+#while True:
+#    clientsocket, addr = serversocket.accept()
+#
+#    print('Connected: ', str(addr), str(clientsocket))
+#
+#    print('Receiving Msg...')
+#    recMsg = clientsocket.recv(1024)
+#    print('[Received Message]', recMsg.decode('ascii'))
+#
+#    msg = ''
+#    while msg != 'exit':
+#        print(msg != 'exit')
+#        msg = input("Send: ")
+#        bytesSent = clientsocket.send(msg.encode('ascii'))
+#        print("bytesSent:", bytesSent)
+#
+#    clientsocket.close()
+#    break
