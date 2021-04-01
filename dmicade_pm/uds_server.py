@@ -1,14 +1,12 @@
 import socket
 import os, os.path
 
-# TESTING STATE
-
 class UdsServer:
     """Unix Domain Socket Server for dmicade process manager."""
 
     _server_socket = None
     _socket_path = ""
-    _client_socket = None
+    _client_conn = None
 
     def __init__(self, socket_path):
         self._socket_path = socket_path
@@ -22,10 +20,10 @@ class UdsServer:
         self._server_socket.bind(self._socket_path)
 
         self._server_socket.listen(1)
-        self._client_socket, addr = self._server_socket.accept()
+        self._client_conn, addr = self._server_socket.accept()
 
     def send(self, message):
-        bytes_sent = self._client_socket.send(message.encode('ascii'))
+        bytes_sent = self._client_conn.send(message.encode('ascii'))
         print('bytesSent:', bytes_sent)
 
     def disconnect(self):
@@ -36,11 +34,11 @@ class UdsServer:
 
     def _receive_msg(self):
         print('Receiving Msg...')
-        rec_msg = self._client_socket.recv(1024)
+        rec_msg = self._client_conn.recv(1024)
         print('[Received Message]', rec_msg.decode('ascii'))
 
     def _is_connected(self):
-        return _client_socket != None
+        return _client_conn != None
 
 
 #serversocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
