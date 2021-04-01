@@ -22,10 +22,10 @@ class UdsServer:
         self._server_socket.bind(self._socket_path)
 
         self._server_socket.listen(1)
-        clientsocket, addr = self._server_socket.accept()
+        self._client_socket, addr = self._server_socket.accept()
 
     def send(self, message):
-        bytes_sent = clientsocket.send(message.encode('ascii'))
+        bytes_sent = self._client_socket.send(message.encode('ascii'))
         print('bytesSent:', bytes_sent)
 
     def disconnect(self):
@@ -36,8 +36,8 @@ class UdsServer:
 
     def _receive_msg(self):
         print('Receiving Msg...')
-        recMsg = clientsocket.recv(1024)
-        print('[Received Message]', recMsg.decode('ascii'))
+        rec_msg = self._client_socket.recv(1024)
+        print('[Received Message]', rec_msg.decode('ascii'))
 
     def _is_connected(self):
         return _client_socket != None
