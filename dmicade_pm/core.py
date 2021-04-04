@@ -1,14 +1,15 @@
 from helper import dmicEvent
 import uds_server, window_handler
 
-class ProjectManager:
+class Client:
+
+    SOCKET_PATH = '/tmp/dmicade_socket.s'
 
     def __init__(self):
         pass
 
     def start(self):
-        socket_path = '/tmp/dmicade_socket.s'
-        server = uds_server.UdsServer(socket_path)
+        server = uds_server.UdsServer(self.SOCKET_PATH)
 
         server.connected_event += lambda x: print('Connected!')
         server.received_event += lambda msg: print('Received: ', msg)
@@ -32,5 +33,5 @@ class ProjectManager:
 
 
 if __name__ == '__main__':
-    pm = ProjectManager()
-    pm.start()
+    client = Client()
+    client.start()
