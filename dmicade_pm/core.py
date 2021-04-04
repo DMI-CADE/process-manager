@@ -1,4 +1,4 @@
-from helper import dmicEvent
+from helper import DmicEvent
 import uds_server, window_handler
 
 class Client:
@@ -9,11 +9,12 @@ class Client:
         pass
 
     def start(self):
+        print('[Client] Connecting to unix domain socket')
         server = uds_server.UdsServer(self.SOCKET_PATH)
 
-        server.connected_event += lambda x: print('Connected!')
-        server.received_event += lambda msg: print('Received: ', msg)
-        server.disconnected_event += lambda x: print('Disconnected...')
+        server.connected_event += lambda x: print('[Client] udsServer: Connected!')
+        server.received_event += lambda msg: print('[Client] udsServer: Received: ', msg)
+        server.disconnected_event += lambda x: print('[Client] udsServer: Disconnected...')
 
         server.start()
 
