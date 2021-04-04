@@ -13,6 +13,7 @@ class Client:
 
         server.connected_event += lambda x: print('Connected!')
         server.received_event += lambda msg: print('Received: ', msg)
+        server.disconnected_event += lambda x: print('Disconnected...')
 
         server.start()
 
