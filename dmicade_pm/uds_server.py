@@ -1,4 +1,4 @@
-from helper import dmicEvent
+from helper import DmicEvent
 import socket, threading
 import os, os.path
 
@@ -8,9 +8,9 @@ class UdsServer:
     CLIENT_TIMEOUT = 0.5
 
     def __init__(self, socket_path):
-        self.connected_event = dmicEvent()
-        self.received_event = dmicEvent()
-        self.disconnected_event = dmicEvent()
+        self.connected_event = DmicEvent()
+        self.received_event = DmicEvent()
+        self.disconnected_event = DmicEvent()
 
         self._connected = False
 

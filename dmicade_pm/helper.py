@@ -1,4 +1,4 @@
-class dmicEvent:
+class DmicEvent:
 
     def __init__(self):
         self._subs = []
