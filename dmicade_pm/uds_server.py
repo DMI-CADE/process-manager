@@ -130,8 +130,8 @@ class UdsServer:
             except socket.timeout:
                 continue
             except socket.error as e:
-                print('[UDS SERVER] receive exception raised:')
-                print(e)
+                #print('[UDS SERVER] receive exception raised:')
+                #print(e)
                 self.close()
 
     def is_connected(self):
