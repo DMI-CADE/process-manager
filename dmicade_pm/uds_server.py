@@ -55,9 +55,12 @@ class UdsServer:
         self.connected_event.update()
 
     def send(self, message):
+        bytes_sent = 0
+
         if self.is_connected():
             bytes_sent = self._client_conn.send(message.encode('ascii'))
-            #print('[UDS SERVER] bytesSent:', bytes_sent)
+
+        return bytes_sent
 
     def _receive_continuous(self):
         #print('[UDS SERVER] Start continuous receive...')
