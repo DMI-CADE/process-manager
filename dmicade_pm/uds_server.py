@@ -3,7 +3,34 @@ import socket, threading
 import os, os.path
 
 class UdsServer:
-    """Unix Domain Socket Server for dmicade process manager."""
+    """Unix Domain Socket Server for dmicade process manager.
+
+    Attributes
+    ----------
+    CLIENT_TIMEOUT : double
+        Client timout time used as interval for checking for received
+        messages.
+    connected_event : DmicEvent
+        Event handler that is raised when the server successfully
+        connects to a client.
+    received_event : DmicEvent
+        Event handler that is raised when the server receives a message
+        from the client when connected.
+    disconnected_event : DmicEvent
+        Event handler that is raised when the server gets disconnected
+        from the client.
+
+    Methods
+    -------
+    start()
+        Starts the server in its seperate thread.
+    close()
+        Disconnects the server socket and stops its threads.
+    send(message)
+        Sends a message to the connected client.
+    is_connected()
+        Checks if server is connected to a client.
+    """
 
     CLIENT_TIMEOUT = 0.5
 
@@ -31,10 +58,24 @@ class UdsServer:
         self.connected_event += lambda arg: self._receive_thread.start()
 
     def start(self):
+        """Starts the server in its seperate thread.
+
+        At first it starts listening for a connection on a seperate
+        thread.
+        If a client connected the receive thread is started and raises
+        the 'received_event' when a message from the client is received.
+        """
+
         self._connect_thread = threading.Thread(target=self._connect)
         self._connect_thread.start()
 
     def close(self):
+        """Disconnects the server socket and stops its threads.
+
+        Only tries to close the connection if the server is curently
+        connected.
+        """
+
         if self.is_connected():
             try:
                 self._client_conn.shutdown(socket.SHUT_WR)
@@ -46,7 +87,19 @@ class UdsServer:
             self._connected = False
 
     def _connect(self):
-        #print('[UDS SERVER] Waiting for connection...')
+        """Sends a message to the connected client.
+
+        Parameters
+        ----------
+        message : str
+            The message to send to the client.
+
+        Retruns
+        -------
+        int
+            The amount of bytes sent to the client.
+        """
+
         self._server_socket.listen(1)
         self._client_conn, addr = self._server_socket.accept()
         self._client_conn.settimeout(self.CLIENT_TIMEOUT)
@@ -63,28 +116,31 @@ class UdsServer:
         return bytes_sent
 
     def _receive_continuous(self):
-        #print('[UDS SERVER] Start continuous receive...')
         while self.is_connected():
-            #print('[UDS SERVER] Receive...')
             try:
                 rec_msg = self._client_conn.recv(1024)
                 msg = rec_msg.decode('ascii')
+                # Close server when msg length of 0 is received indication a closed connection.
                 if len(msg) == 0:
-                    print('[UDS SERVER] Connection closed by remote host.')
+                    #print('[UDS SERVER] Connection closed by remote host.')
                     self.close()
                     break
 
-                print('[UDS SERVER] Received:', msg)
                 self.received_event.update(msg)
             except socket.timeout:
-                #print('[UDS SERVER] receive timeout...')
                 continue
             except socket.error as e:
                 print('[UDS SERVER] receive exception raised:')
                 print(e)
                 self.close()
-                
-        #print('[UDS SERVER] Continuous receive stopped.')
 
     def is_connected(self):
+        """Checks if server is connected to a client.
+
+        Returns
+        -------
+        bool
+            True if server is currently connected to a client.
+        """
+
         return self._connected
