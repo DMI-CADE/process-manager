@@ -1,4 +1,4 @@
-from helper import DmicEvent
+from .helper import DmicEvent
 import socket, threading
 import os, os.path
 
