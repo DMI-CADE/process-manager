@@ -19,7 +19,7 @@ class Client:
     def start(self):
         print('[PM CLIENT] Start')
 
-        t = threading.Thread(target=self._debug_input)
+        t = threading.Thread(target=self._debug_input, daemon=True)
         t.start()
 
         self._state_machine.queue_task_for_state({'type': DmicTaskType.TEST, 'data': ':)'})
@@ -36,6 +36,11 @@ class Client:
             user_input = input()
             if check_input('test'):
                 self._state_machine.queue_task_for_state({'type': DmicTaskType.TEST, 'data': user_input})
+            elif check_input('t3'):
+                self._state_machine.queue_task_for_state({'type': DmicTaskType.TEST, 'data': '1'})
+                self._state_machine.queue_task_for_state({'type': DmicTaskType.TEST, 'data': '2'})
+                self._state_machine.queue_task_for_state({'type': DmicTaskType.TEST, 'data': '3'})
+                self._state_machine.queue_task_for_state({'type': DmicTaskType.CHANGE_STATE, 'data': 'start'})
             elif check_input('swst'):
                 state = (state + 1) % len(states)
                 self._state_machine.queue_task_for_state({'type': DmicTaskType.CHANGE_STATE, 'data': states[state]})
