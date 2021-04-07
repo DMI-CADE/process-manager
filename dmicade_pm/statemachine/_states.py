@@ -52,8 +52,11 @@ class DmicStatePool:
                 # Add instance of state to pool.
                 self._pool[state_id] = globals()[key](command_pool)
 
-    def get_state(self, state_type) -> DmicState:
-        return self._pool.get(state_type)
+    def get_state(self, state_id: str) -> DmicState:
+        return self._pool.get(state_id)
+
+    def state_exists(self, state_id: str) -> bool:
+        return state_id in self._pool
 
 
 class S_Test(DmicState):
