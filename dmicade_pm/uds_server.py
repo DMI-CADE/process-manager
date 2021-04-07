@@ -75,8 +75,7 @@ class UdsServer:
         thread.
         If a client connected the receive thread is started and raises
         the 'received_event' when a message from the client is received.
-
-        Will do nothing on windows.
+        Will do nothing on Windows.
         """
 
         if os.name == 'nt':
@@ -103,7 +102,7 @@ class UdsServer:
 
             self._connected = False
 
-    def _connect(self):
+    def send(self, message, return_zero_on_windows=False):
         """Sends a message to the connected client.
 
         Parameters
@@ -117,14 +116,6 @@ class UdsServer:
             The amount of bytes sent to the client.
         """
 
-        self._server_socket.listen(1)
-        self._client_conn, addr = self._server_socket.accept()
-        self._client_conn.settimeout(self.CLIENT_TIMEOUT)
-
-        self._connected = True
-        self.connected_event.update()
-
-    def send(self, message, return_zero_on_windows=False):
         bytes_sent = 0
 
         if os.name == 'nt':
@@ -136,6 +127,14 @@ class UdsServer:
             bytes_sent = self._client_conn.send(message.encode('ascii'))
 
         return bytes_sent
+
+    def _connect(self):
+        self._server_socket.listen(1)
+        self._client_conn, addr = self._server_socket.accept()
+        self._client_conn.settimeout(self.CLIENT_TIMEOUT)
+
+        self._connected = True
+        self.connected_event.update()
 
     def _receive_continuous(self):
         while self.is_connected():
