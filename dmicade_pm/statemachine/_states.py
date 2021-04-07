@@ -1,8 +1,10 @@
+from abc import ABC
+
 STATE_PREFIX = 'S_'
 
 
-class DmicState:
-    """Informal interface for states."""
+class DmicState(ABC):
+    """Abstract state class."""
 
     def __init__(self, command_pool):
         self.command_pool = command_pool
@@ -50,9 +52,7 @@ class DmicStatePool:
                 # Add instance of state to pool.
                 self._pool[state_id] = globals()[key](command_pool)
 
-        print(self._pool)
-
-    def get_state(self, state_type):
+    def get_state(self, state_type) -> DmicState:
         return self._pool.get(state_type)
 
 
@@ -62,7 +62,11 @@ class S_Test(DmicState):
         print('[DMICSTATE TEST]: Enter')
 
     def handle(self, task: dict):
-        print('[DMICSTATE TEST]: Handle')
+        print('[DMICSTATE TEST]: Handle:', task)
 
     def exit(self):
         print('[DMICSTATE TEST]: Exit')
+
+
+class S_Start(DmicState):
+    pass
