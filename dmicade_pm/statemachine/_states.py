@@ -1,8 +1,9 @@
-
 STATE_PREFIX = 'S_'
+
 
 class DmicState:
     """Informal interface for states."""
+
     def __init__(self, command_pool):
         self.command_pool = command_pool
 
@@ -17,6 +18,7 @@ class DmicState:
     def exit(self) -> None:
         """Runs when exiting the state."""
         pass
+
 
 class DmicStatePool:
 
@@ -48,6 +50,7 @@ class DmicStatePool:
 
     def get_state(self, state_type):
         return self._pool.get(state_type)
+
 
 class S_Test(DmicState):
 

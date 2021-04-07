@@ -1,7 +1,10 @@
-from .helper import DmicEvent
-import socket, threading
-import os, os.path
+import os
+import os.path
+import socket
+import threading
 import warnings
+
+from .helper import DmicEvent
 
 
 class UdsServer:

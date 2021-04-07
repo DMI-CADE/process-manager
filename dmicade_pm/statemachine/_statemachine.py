@@ -1,5 +1,6 @@
 from ._states import DmicStatePool
 
+
 class DmicStateMachine:
     """Statemachine of the processmanager."""
 

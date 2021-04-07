@@ -1,7 +1,7 @@
 import subprocess
 
-class WindowHandler:
 
+class WindowHandler:
     _process = None
 
     def __init__(self):
