@@ -1,9 +1,16 @@
-from helper import DmicEvent
-import socket, threading
-import os, os.path
+import os
+import os.path
+import socket
+import threading
+import warnings
+
+from .helper import DmicEvent
+
 
 class UdsServer:
     """Unix Domain Socket Server for dmicade process manager.
+
+    Will disable core functionalities on Windows.
 
     Attributes
     ----------
@@ -23,7 +30,7 @@ class UdsServer:
     Methods
     -------
     start()
-        Starts the server in its seperate thread.
+        Starts the server in its separate thread.
     close()
         Disconnects the server socket and stops its threads.
     send(message)
@@ -48,6 +55,10 @@ class UdsServer:
         self._receive_thread = None
         self._connect_thread = None
 
+        if os.name == 'nt':
+            warnings.warn('Uds socket functionalities are is disabled on Windows.')
+            return
+
         self._server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         if os.path.exists(self._socket_path):
             os.remove(self._socket_path)
@@ -64,10 +75,15 @@ class UdsServer:
         thread.
         If a client connected the receive thread is started and raises
         the 'received_event' when a message from the client is received.
+        Will do nothing on Windows.
         """
 
-        self._connect_thread = threading.Thread(target=self._connect)
-        self._connect_thread.start()
+        if os.name == 'nt':
+            warnings.warn('Uds socket functionalities are is disabled on Windows.')
+
+        else:
+            self._connect_thread = threading.Thread(target=self._connect)
+            self._connect_thread.start()
 
     def close(self):
         """Disconnects the server socket and stops its threads.
@@ -80,13 +96,13 @@ class UdsServer:
             try:
                 self._client_conn.shutdown(socket.SHUT_WR)
                 self._client_conn.close()
-            except:
-                #print('[UDS SERVER] Shutdown failed.')
+            except socket.error as e:
+                # print('[UDS SERVER] Shutdown failed.')
                 pass
 
             self._connected = False
 
-    def _connect(self):
+    def send(self, message, return_zero_on_windows=False):
         """Sends a message to the connected client.
 
         Parameters
@@ -100,20 +116,25 @@ class UdsServer:
             The amount of bytes sent to the client.
         """
 
+        bytes_sent = 0
+
+        if os.name == 'nt':
+            if not return_zero_on_windows:
+                bytes_sent = len(message)
+            warnings.warn(f'UDS Server will not send msg on windows. Returning: {bytes_sent}')
+
+        elif self.is_connected():
+            bytes_sent = self._client_conn.send(message.encode('ascii'))
+
+        return bytes_sent
+
+    def _connect(self):
         self._server_socket.listen(1)
         self._client_conn, addr = self._server_socket.accept()
         self._client_conn.settimeout(self.CLIENT_TIMEOUT)
 
         self._connected = True
         self.connected_event.update()
-
-    def send(self, message):
-        bytes_sent = 0
-
-        if self.is_connected():
-            bytes_sent = self._client_conn.send(message.encode('ascii'))
-
-        return bytes_sent
 
     def _receive_continuous(self):
         while self.is_connected():
@@ -122,7 +143,7 @@ class UdsServer:
                 msg = rec_msg.decode('ascii')
                 # Close server when msg length of 0 is received indication a closed connection.
                 if len(msg) == 0:
-                    #print('[UDS SERVER] Connection closed by remote host.')
+                    # print('[UDS SERVER] Connection closed by remote host.')
                     self.close()
                     break
 
@@ -130,8 +151,8 @@ class UdsServer:
             except socket.timeout:
                 continue
             except socket.error as e:
-                #print('[UDS SERVER] receive exception raised:')
-                #print(e)
+                # print('[UDS SERVER] receive exception raised:')
+                # print(e)
                 self.close()
 
     def is_connected(self):
