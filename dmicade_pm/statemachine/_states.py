@@ -25,8 +25,8 @@ class DmicStatePool:
     def __init__(self, command_pool):
         """Constructor for class DmicStatePool
 
-        Fills it the pool with a single isntance of every subclass of
-        DmicState from this module. The dictonary key for a state is
+        Fills it the pool with a single instance of every subclass of
+        DmicState from this module. The dictionary key for a state is
         the states class name without the global state prefix in
         lowercase.
         """
@@ -40,10 +40,14 @@ class DmicStatePool:
                 continue
 
             if issubclass(globals()[key], DmicState):
-                state_id = key.lower()
+                state_id = key
                 if state_id.startswith(STATE_PREFIX):
+                    # Cut prefix off.
                     state_id = state_id[len(STATE_PREFIX):]
 
+                state_id = state_id.lower()
+
+                # Add instance of state to pool.
                 self._pool[state_id] = globals()[key](command_pool)
 
         print(self._pool)
