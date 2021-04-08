@@ -17,7 +17,7 @@ class DmicStateMachine:
 
     def __init__(self, command_pool):
         self._state_pool = DmicStatePool(command_pool)
-        self._current_state = self._state_pool.get_state('start')
+        self._current_state = self._state_pool.get_object('start')
         self._task_queue = []
         self._is_running = False
 
@@ -67,9 +67,9 @@ class DmicStateMachine:
 
     def _change_state(self, state_name: str):
         self._current_state.exit()
-        if not self._state_pool.state_exists(state_name):
+        if not self._state_pool.object_exists(state_name):
             raise Exception('[DMIC STATE MACHINE] Unknown State')
-        self._current_state = self._state_pool.get_state(state_name)
+        self._current_state = self._state_pool.get_object(state_name)
         self._current_state.enter()
 
     def _ready_task_buffer(self):
