@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 class DmicCommand(ABC):
     """Abstract class for Dmic commands."""
 
-    def __init__(self, project_manager, command_pool):
-        self._pm_receiver = project_manager
+    def __init__(self, process_manager, command_pool):
+        self._pm_receiver = process_manager
         self._c_pool = command_pool
 
     @abstractmethod
@@ -18,4 +18,4 @@ class C_Test(DmicCommand):
         print(f"""[TEST COMMAND]: Execute:
          |- data: {data}
          |- command pool: {self._c_pool}
-         |- project manager: {self._pm_receiver}""")
+         |- process manager: {self._pm_receiver}""")

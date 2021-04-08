@@ -28,7 +28,6 @@ class ObjectPool:
             if not isinstance(_globals[key], type) or _globals[key] == parent_class:
                 continue
 
-            print(issubclass(_globals[key], parent_class))
             if issubclass(_globals[key], parent_class):
                 state_id = key
                 if state_id.startswith(object_class_prefix):

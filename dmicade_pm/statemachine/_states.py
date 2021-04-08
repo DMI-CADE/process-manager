@@ -1,18 +1,20 @@
 from abc import ABC
 from ..helper import ObjectPool
+from ._tasks import DmicTask, DmicTaskType
+from ..commands import DmicCommandPool
 
 
 class DmicState(ABC):
     """Abstract state class."""
 
-    def __init__(self, command_pool):
+    def __init__(self, command_pool: DmicCommandPool):
         self.command_pool = command_pool
 
     def enter(self) -> None:
         """Runs when entering the state."""
         pass
 
-    def handle(self, task: dict) -> None:
+    def handle(self, task: DmicTask) -> None:
         """Handles occurring tasks."""
         pass
 
@@ -26,7 +28,7 @@ class DmicStatePool(ObjectPool):
 
     STATE_PREFIX = 'S_'
 
-    def __init__(self, command_pool):
+    def __init__(self, command_pool: DmicCommandPool):
         """Constructor for class DmicStatePool."""
         super().__init__(globals(), DmicState, self.STATE_PREFIX, command_pool)
 
@@ -34,13 +36,15 @@ class DmicStatePool(ObjectPool):
 class S_Test(DmicState):
 
     def enter(self):
-        print('[DMICSTATE TEST]: Enter')
+        print('[TEST STATE]: Enter')
 
-    def handle(self, task: dict):
-        print('[DMICSTATE TEST]: Handle:', task)
+    def handle(self, task: DmicTask):
+        print('[TEST STATE]: Handle:', task)
+        if task.task_type is DmicTaskType.TEST:
+            self.command_pool.invoke_command('test', task.data)
 
     def exit(self):
-        print('[DMICSTATE TEST]: Exit')
+        print('[TEST STATE]: Exit')
 
 
 class S_Start(DmicState):

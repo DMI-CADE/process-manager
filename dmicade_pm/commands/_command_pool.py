@@ -2,7 +2,7 @@ from .concrete_commands import *
 from ..helper import ObjectPool
 
 
-class CommandPool(ObjectPool):
+class DmicCommandPool(ObjectPool):
     """Command Pool for concrete dmic commands."""
     COMMAND_PREFIX = 'C_'
 

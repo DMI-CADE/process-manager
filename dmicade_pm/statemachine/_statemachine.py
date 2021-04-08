@@ -1,5 +1,5 @@
 from ._states import DmicStatePool
-from ._tasks import DmicTaskType
+from ._tasks import DmicTask, DmicTaskType
 
 
 class DmicStateMachine:
@@ -43,7 +43,7 @@ class DmicStateMachine:
 
         self._is_running = False
 
-    def queue_task_for_state(self, task: dict):
+    def queue_task_for_state(self, task: DmicTask):
         """Queues a task to be handled by the current state.
 
         Parameters
@@ -57,8 +57,8 @@ class DmicStateMachine:
     def _execute_next_task(self):
         current_task = self._task_queue[0]
 
-        if current_task['type'] is DmicTaskType.CHANGE_STATE:
-            self._change_state(current_task['data'])
+        if current_task.task_type is DmicTaskType.CHANGE_STATE:
+            self._change_state(current_task.data)
 
         else:
             self._current_state.handle(current_task)
