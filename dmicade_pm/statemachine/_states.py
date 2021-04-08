@@ -28,10 +28,7 @@ class DmicStatePool(ObjectPool):
 
     def __init__(self, command_pool):
         """Constructor for class DmicStatePool."""
-        super().__init__()
-
-        self.fill_object_pool(globals(), DmicState, self.STATE_PREFIX, command_pool)
-        print('[STATEM] Object pool:', self._pool)
+        super().__init__(globals(), DmicState, self.STATE_PREFIX, command_pool)
 
 
 class S_Test(DmicState):

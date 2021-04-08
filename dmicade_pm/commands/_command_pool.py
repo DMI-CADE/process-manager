@@ -7,9 +7,7 @@ class CommandPool(ObjectPool):
     COMMAND_PREFIX = 'C_'
 
     def __init__(self, process_manager):
-        super().__init__()
-        self.fill_object_pool(globals(), DmicCommand, self.COMMAND_PREFIX, process_manager, self)
-        print('[STATEM] Object pool:', self._pool)
+        super().__init__(globals(), DmicCommand, self.COMMAND_PREFIX, process_manager, self)
 
     def invoke_command(self, command_id, data):
         if not self.object_exists(command_id):

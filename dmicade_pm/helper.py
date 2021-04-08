@@ -13,24 +13,18 @@ class DmicEvent:
 
 
 class ObjectPool:
-    def __init__(self):
-        self._pool = None
-
-    def fill_object_pool(self, _globals, parent_class, object_class_prefix, *args):
-        """Returns filled object pool.
+    def __init__(self, _globals, parent_class, object_class_prefix, *args):
+        """Constructor for class ObjectPool.
 
         Fills a pool with a single instance of every subclass of
         given parent class from given global context. The dictionary key
         for an object is the objects class name without the given prefix in
         lowercase."""
 
-        object_pool = dict()
-        print(f'make object pool:\n{_globals}\n{parent_class}\n{object_class_prefix}\n{args}')
+        self._pool = dict()
 
         for key in _globals:
-            print(key)
             # Skip non classes and state parent.
-            print(not isinstance(_globals[key], type), _globals[key] == parent_class)
             if not isinstance(_globals[key], type) or _globals[key] == parent_class:
                 continue
 
@@ -42,12 +36,11 @@ class ObjectPool:
                     state_id = state_id[len(object_class_prefix):]
 
                 state_id = state_id.lower()
-                print(state_id)
+                if state_id in self._pool:
+                    raise Exception('[OBJECT POOL] Multiple objects have the same name...')
 
                 # Add instance of state to pool.
-                object_pool[state_id] = _globals[key](*args)
-
-        self._pool = object_pool
+                self._pool[state_id] = _globals[key](*args)
 
     def object_exists(self, object_id):
         return object_id in self._pool
