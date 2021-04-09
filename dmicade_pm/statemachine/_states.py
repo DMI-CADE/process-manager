@@ -1,19 +1,20 @@
 from abc import ABC
-
-STATE_PREFIX = 'S_'
+from ..helper import ObjectPool
+from ._tasks import DmicTask, DmicTaskType
+from ..commands import DmicCommandPool
 
 
 class DmicState(ABC):
     """Abstract state class."""
 
-    def __init__(self, command_pool):
+    def __init__(self, command_pool: DmicCommandPool):
         self.command_pool = command_pool
 
     def enter(self) -> None:
         """Runs when entering the state."""
         pass
 
-    def handle(self, task: dict) -> None:
+    def handle(self, task: DmicTask) -> None:
         """Handles occurring tasks."""
         pass
 
@@ -22,53 +23,28 @@ class DmicState(ABC):
         pass
 
 
-class DmicStatePool:
+class DmicStatePool(ObjectPool):
+    """Command pool for concrete"""
 
-    def __init__(self, command_pool):
-        """Constructor for class DmicStatePool
+    STATE_PREFIX = 'S_'
 
-        Fills it the pool with a single instance of every subclass of
-        DmicState from this module. The dictionary key for a state is
-        the states class name without the global state prefix in
-        lowercase.
-        """
-
-        self._pool = dict()
-
-        # Fill pool with states.
-        for key in globals():
-            # Skip non classes and state interface.
-            if not isinstance(globals()[key], type) or globals()[key] == DmicState:
-                continue
-
-            if issubclass(globals()[key], DmicState):
-                state_id = key
-                if state_id.startswith(STATE_PREFIX):
-                    # Cut prefix off.
-                    state_id = state_id[len(STATE_PREFIX):]
-
-                state_id = state_id.lower()
-
-                # Add instance of state to pool.
-                self._pool[state_id] = globals()[key](command_pool)
-
-    def get_state(self, state_id: str) -> DmicState:
-        return self._pool.get(state_id)
-
-    def state_exists(self, state_id: str) -> bool:
-        return state_id in self._pool
+    def __init__(self, command_pool: DmicCommandPool):
+        """Constructor for class DmicStatePool."""
+        super().__init__(globals(), DmicState, self.STATE_PREFIX, command_pool)
 
 
 class S_Test(DmicState):
 
     def enter(self):
-        print('[DMICSTATE TEST]: Enter')
+        print('[TEST STATE]: Enter')
 
-    def handle(self, task: dict):
-        print('[DMICSTATE TEST]: Handle:', task)
+    def handle(self, task: DmicTask):
+        print('[TEST STATE]: Handle:', task)
+        if task.task_type is DmicTaskType.TEST:
+            self.command_pool.invoke_command('test', task.data)
 
     def exit(self):
-        print('[DMICSTATE TEST]: Exit')
+        print('[TEST STATE]: Exit')
 
 
 class S_Start(DmicState):
