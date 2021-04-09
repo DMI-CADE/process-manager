@@ -11,10 +11,10 @@ class DmicProcessManager:
         self._timer = timer
 
     def send_to_ui(self, msg: str):
-        pass
+        self._uds_server.send(msg)
 
     def queue_state_task(self, task: DmicTask):
-        pass
+        self._client.queue_state_task(task)
 
     def start_app(self, app_id):
         pass
