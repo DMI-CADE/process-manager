@@ -67,8 +67,6 @@ class DmicStateMachine:
 
     def _change_state(self, state_name: str):
         self._current_state.exit()
-        if not self._state_pool.object_exists(state_name):
-            raise Exception('[DMIC STATE MACHINE] Unknown State')
         self._current_state = self._state_pool.get_object(state_name)
         self._current_state.enter()
 
