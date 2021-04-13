@@ -12,33 +12,20 @@ class UdsServer:
 
     Will disable core functionalities on Windows.
 
-    Attributes
-    ----------
-    CLIENT_TIMEOUT : double
-        Client timout time used as interval for checking for received
-        messages.
-    connected_event : DmicEvent
+    Attributes:
+      connected_event : DmicEvent
         Event handler that is raised when the server successfully
         connects to a client.
-    received_event : DmicEvent
+      received_event : DmicEvent
         Event handler that is raised when the server receives a message
         from the client when connected.
-    disconnected_event : DmicEvent
+      disconnected_event : DmicEvent
         Event handler that is raised when the server gets disconnected
         from the client.
-
-    Methods
-    -------
-    start()
-        Starts the server in its separate thread.
-    close()
-        Disconnects the server socket and stops its threads.
-    send(message)
-        Sends a message to the connected client.
-    is_connected()
-        Checks if server is connected to a client.
     """
 
+    """Client timeout time used as interval for checking for received
+    messages."""
     CLIENT_TIMEOUT = 0.5
 
     def __init__(self, socket_path):
@@ -69,9 +56,9 @@ class UdsServer:
         self.connected_event += lambda arg: self._receive_thread.start()
 
     def start(self):
-        """Starts the server in its seperate thread.
+        """Starts the server in its separate thread.
 
-        At first it starts listening for a connection on a seperate
+        At first it starts listening for a connection on a separate
         thread.
         If a client connected the receive thread is started and raises
         the 'received_event' when a message from the client is received.
@@ -88,7 +75,7 @@ class UdsServer:
     def close(self):
         """Disconnects the server socket and stops its threads.
 
-        Only tries to close the connection if the server is curently
+        Only tries to close the connection if the server is currently
         connected.
         """
 
@@ -105,15 +92,12 @@ class UdsServer:
     def send(self, message, return_zero_on_windows=False):
         """Sends a message to the connected client.
 
-        Parameters
-        ----------
-        message : str
+        Args:
+          message: str
             The message to send to the client.
 
-        Retruns
-        -------
-        int
-            The amount of bytes sent to the client.
+        Returns:
+          The amount of bytes sent to the client.
         """
 
         bytes_sent = 0
@@ -129,6 +113,8 @@ class UdsServer:
         return bytes_sent
 
     def _connect(self):
+        """Synchronously listens for a client to connect."""
+
         self._server_socket.listen(1)
         self._client_conn, addr = self._server_socket.accept()
         self._client_conn.settimeout(self.CLIENT_TIMEOUT)
@@ -137,10 +123,19 @@ class UdsServer:
         self.connected_event.update()
 
     def _receive_continuous(self):
+        """Synchronously checks for received messages from the client.
+
+        Checks for a new message every time the recv times out.
+        Updates the received event when message was received.
+        Closes the connection when a socket error occurs or a message
+        length of 0 is received.
+        """
+
         while self.is_connected():
             try:
                 rec_msg = self._client_conn.recv(1024)
                 msg = rec_msg.decode('ascii')
+
                 # Close server when msg length of 0 is received indication a closed connection.
                 if len(msg) == 0:
                     # print('[UDS SERVER] Connection closed by remote host.')
@@ -148,6 +143,7 @@ class UdsServer:
                     break
 
                 self.received_event.update(msg)
+
             except socket.timeout:
                 continue
             except socket.error as e:
@@ -158,10 +154,8 @@ class UdsServer:
     def is_connected(self):
         """Checks if server is connected to a client.
 
-        Returns
-        -------
-        bool
-            True if server is currently connected to a client.
+        Returns:
+          True if server is currently connected to a client.
         """
 
         return self._connected

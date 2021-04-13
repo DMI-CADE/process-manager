@@ -5,14 +5,9 @@ from ._tasks import DmicTask, DmicTaskType
 class DmicStateMachine:
     """Statemachine of the processmanager.
 
-    Methods
-    -------
-    run_event_loop_sync()
-        Runs synchronous state machine loop.
-    stop_event_loop()
-        Stops event loop.
-    queue_task_for_state(task: dict)
-        Queues a task to be handled by the current state.
+    Has an active state to handle tasks and a task queue. The event
+    loop handles task execution generally by delegating it to the
+    active state.
     """
 
     def __init__(self, command_pool):
@@ -46,15 +41,16 @@ class DmicStateMachine:
     def queue_task_for_state(self, task: DmicTask):
         """Queues a task to be handled by the current state.
 
-        Parameters
-        ----------
-        task : dict
+        Args:
+          task: dict
             The task to queue.
         """
 
         self._task_queue.append(task)
 
     def _execute_next_task(self):
+        """Handles execution of the next queued task."""
+
         current_task = self._task_queue[0]
 
         if current_task.task_type is DmicTaskType.CHANGE_STATE:
@@ -66,6 +62,8 @@ class DmicStateMachine:
         self._task_queue.remove(current_task)
 
     def _change_state(self, state_name: str):
+        """Handles steps to change to the next state."""
+
         self._current_state.exit()
         self._current_state = self._state_pool.get_object(state_name)
         self._current_state.enter()

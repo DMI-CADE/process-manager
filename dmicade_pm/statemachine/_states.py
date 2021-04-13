@@ -15,7 +15,12 @@ class DmicState(ABC):
         pass
 
     def handle(self, task: DmicTask) -> None:
-        """Handles occurring tasks."""
+        """Handles occurring tasks.
+
+        Args:
+          task:
+            A DmicTask to handle by the state.
+        """
         pass
 
     def exit(self) -> None:
@@ -31,6 +36,9 @@ class DmicStatePool(ObjectPool):
     def __init__(self, command_pool: DmicCommandPool):
         """Constructor for class DmicStatePool."""
         super().__init__(globals(), DmicState, self.STATE_PREFIX, command_pool)
+
+
+# Concrete States:
 
 
 class S_Test(DmicState):

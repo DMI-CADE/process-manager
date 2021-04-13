@@ -17,9 +17,9 @@ class ObjectPool:
         """Constructor for class ObjectPool.
 
         Fills a pool with a single instance of every subclass of
-        given parent class from given global context. The dictionary key
-        for an object is the objects class name without the given prefix in
-        lowercase."""
+        given parent class from given global context. The dictionary
+        key/object id for an object is the objects class name without
+        the given prefix in lowercase."""
 
         self._pool = dict()
 
@@ -41,10 +41,28 @@ class ObjectPool:
                 # Add instance of state to pool.
                 self._pool[state_id] = _globals[key](*args)
 
-    def object_exists(self, object_id):
+    def object_exists(self, object_id: str):
+        """Checks if an object ID exists in the pool.
+
+        Args:
+          object_id: ID to check for.
+
+        Returns:
+          Bool of whether the object ID is in the pool.
+        """
+
         return object_id in self._pool
 
-    def get_object(self, object_id):
+    def get_object(self, object_id: str):
+        """Retrieves an object from the pool by its ID.
+
+        Args:
+          object_id: ID of the object to retrieve from the pool.
+
+        Returns:
+          The object reference from the object pool.
+        """
+
         if not self.object_exists(object_id):
             raise Exception(f'[OBJECT POOL] Tried to get non existing object: {object_id}')
         return self._pool[object_id]
