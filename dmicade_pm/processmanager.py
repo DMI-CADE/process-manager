@@ -1,4 +1,5 @@
 from .statemachine import DmicTask
+from .application_handler import DmicApplicationHandler
 
 
 class DmicProcessManager:
@@ -6,7 +7,7 @@ class DmicProcessManager:
 
     def __init__(self, client, uds_server, timer):
         self._client = client
-        self._window_handler = None
+        self._app_handler = DmicApplicationHandler()
         self._uds_server = uds_server
         self._timer = timer
 

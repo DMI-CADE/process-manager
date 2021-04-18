@@ -1,3 +1,8 @@
+class DmicException(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+
 class DmicEvent:
 
     def __init__(self):

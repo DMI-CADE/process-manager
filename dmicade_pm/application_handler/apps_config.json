@@ -1,0 +1,14 @@
+{
+    "_apps_location": "/home/dmicade/dmic-apps/",
+
+    "testapp": {
+        "type": "executable",
+        "exe": "dmiCade_devTests.x86_64",
+        "_debug_path": "/media/sf_vm_shared_folder/unity_test_build/dmiCade_devTests.x86_64"
+    },
+
+    "alien-soldier": {
+        "type": "mame_rom",
+        "command": "mame genesis -cartridge ~/dmic-apps/alien-soldier/aliensol.zip"
+    }
+}
