@@ -130,3 +130,6 @@ dmypy.json
 
 # IDEA project setting
 .idea
+
+# Others
+history/
