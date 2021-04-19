@@ -1,1 +1,1 @@
-from .application_handler import DmicApplicationHandler
+from ._application_handler import DmicApplicationHandler

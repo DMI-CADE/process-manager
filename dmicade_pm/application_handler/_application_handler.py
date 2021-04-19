@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-from .applications import DmicAppNotRunningException, DmicAppNotConfiguredException, dmic_app_process_factory
+from ._applications import DmicAppNotRunningException, DmicAppNotConfiguredException, dmic_app_process_factory
 
 
 class DmicApplicationHandler:
