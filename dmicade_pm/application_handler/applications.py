@@ -21,7 +21,7 @@ class DmicApp(ABC):
         self._should_be_running = False
 
     def run(self, apps_path):
-        print('[DMICAPP] Run...')
+        # print('[DMICAPP] Run...')
         self.sub_process = self._start_app(apps_path)
 
         self._crash_check_thread = threading.Thread(
@@ -32,18 +32,17 @@ class DmicApp(ABC):
         self._should_be_running = True
 
     def _wait_for_crash(self):
-        # time.sleep(1)
         self.sub_process.wait()
 
         if self._should_be_running:
-            print('[DMICAPP] APP CRASH!')
+            # print('[DMICAPP] APP CRASH!')
             self.crash_event.update()
 
     def stop(self):
-        print('[DMICAPP] Stop...')
+        # print('[DMICAPP] Stop...')
         self._should_be_running = False
 
-        print('[DMICAPP] Terminate:', self.app_id)
+        # print('[DMICAPP] Terminate:', self.app_id)
         self.sub_process.terminate()
 
     def is_running(self):
@@ -65,7 +64,7 @@ class DmicAppMameRom(DmicApp):
         return 'MAME'
 
     def _start_app(self, apps_path):
-        print('[DMICAPP MAME] Start...')
+        # print('[DMICAPP MAME] Start...')
         if 'command' not in self.app_config:
             raise DmicAppNotConfiguredException(self.app_id)
 
@@ -83,7 +82,7 @@ class DmicAppExecutable(DmicApp):
         return self.app_config['exe']
 
     def _start_app(self, apps_path):
-        print('[DMICAPP EXE] Start...')
+        # print('[DMICAPP EXE] Start...')
         if 'exe' not in self.app_config:
             raise DmicAppNotConfiguredException(self.app_id)
 
