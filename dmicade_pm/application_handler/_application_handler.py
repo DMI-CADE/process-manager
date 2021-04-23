@@ -22,13 +22,16 @@ class DmicApplicationHandler:
 
     """Default apps config file path."""
     APPS_CONFIG_FILE_PATH = './dmicade_pm/application_handler/apps_config.json'
+
     CMD_GET_FOCUSED_WINDOW_ID = 'xdotool getactivewindow'
     CMD_SEARCH_WINDOW = 'xdotool search --onlyvisible %s | head -n1'  # Only returns first found id.
     CMD_FOCUS_WINDOW_SYNC = 'xdotool search --onlyvisible %s windowactivate --sync'
     CMD_KILL_WINDOW = 'xdotool search --onlyvisible %s windowkill'
 
-    def __init__(self, apps_location=''):
+    def __init__(self, process_manager, apps_location=''):
         """Constructor for class DmicApplicationHandler"""
+
+        self.process_manager = process_manager
 
         self.apps_config = dict()
         with open(self.APPS_CONFIG_FILE_PATH) as json_file:
@@ -158,7 +161,7 @@ class DmicApplicationHandler:
         return window_id
 
     def _get_crash_callback_function(self, app_id):
-        return lambda x: print(f'[CRASH EVENT SUB] crashed event invoked... {app_id}')
+        return lambda arg: self.process_manager.queue_crash_notification(app_id)
 
 
 def sp_check_output(cmd):

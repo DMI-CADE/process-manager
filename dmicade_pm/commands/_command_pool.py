@@ -1,4 +1,4 @@
-from .concrete_commands import DmicCommand
+from .concrete_commands import *
 from ..helper import ObjectPool
 
 

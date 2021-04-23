@@ -14,15 +14,15 @@ class Client:
     SOCKET_PATH = '/tmp/dmicade_socket.s'
 
     def __init__(self):
-        self._process_manager = DmicProcessManager(self)
+        self._uds_server = UdsServer(self.SOCKET_PATH)
+        self._process_manager = DmicProcessManager(self, self._uds_server, None)
         self._command_pool = DmicCommandPool(self._process_manager)
         self._state_machine = DmicStateMachine(self._command_pool)
-        self._uds_server = UdsServer(self.SOCKET_PATH)
 
     def start(self):
         print('[PM CLIENT] Start')
 
-        t = threading.Thread(target=self._debug_input, daemon=True)
+        t = threading.Thread(target=self._debug, daemon=True)
         t.start()
 
         self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.TEST, ':)'))
@@ -31,7 +31,7 @@ class Client:
     def queue_state_task(self, task: DmicTask):
         self._state_machine.queue_task_for_state(task)
 
-    def _debug_input(self):
+    def _debug(self):
         user_input = ''
         states = ['start', 'test']
         state = 0

@@ -53,7 +53,7 @@ class DmicStateMachine:
 
         current_task = self._task_queue[0]
 
-        if current_task.task_type is DmicTaskType.CHANGE_STATE:
+        if current_task.type is DmicTaskType.CHANGE_STATE:
             self._change_state(current_task.data)
 
         else:

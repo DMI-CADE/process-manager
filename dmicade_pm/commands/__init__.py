@@ -1,1 +1,1 @@
-from ._command_pool import DmicCommandPool
+from ._command_pool import *
