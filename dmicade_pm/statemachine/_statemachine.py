@@ -24,6 +24,8 @@ class DmicStateMachine:
 
         self._is_running = True
 
+        self._current_state.enter()
+
         while self._is_running:
             if len(self._task_queue) > 0:
                 task_is_ready = self._ready_task_buffer()
