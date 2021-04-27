@@ -37,6 +37,8 @@ class DmicStatePool(ObjectPool):
         """Constructor for class DmicStatePool."""
         super().__init__(globals(), DmicState, self.STATE_PREFIX, command_pool)
 
+        logging.debug(f'[STATE POOL]: {self._pool=}')
+
 
 # Concrete States:
 
@@ -66,21 +68,19 @@ class S_InMenu(DmicState):
         self.cmd_change_state = command_pool.get_object('changestate')
 
     def enter(self):
-        # print(' [STATE: INMENU] Enter.')
-        pass
+        logging.debug('[STATE: INMENU] Enter.')
 
     def handle(self, task):
-        # print(' [STATE: INMENU] Handle:', task)
+        logging.debug(f'[STATE: INMENU] Handle: {task=}')
 
         if task.type is DmicTaskType.START_APP:
-            # print(' [STATE: INMENU] Start game!')
+            logging.debug('[STATE: INMENU] Start game!')
             app_id = task.data
             self.cmd_change_state.execute('ingame')
             self.cmd_start_game.execute(app_id)
 
     def exit(self):
-        # print(' [STATE: INMENU] Exit')
-        pass
+        logging.debug('[STATE: INMENU] Exit')
 
 
 class S_InGame(DmicState):
@@ -90,14 +90,14 @@ class S_InGame(DmicState):
         self.cmd_change_state = command_pool.get_object('changestate')
 
     def handle(self, task):
-        # print(' [STATE: INGAME] Handle:', task)
+        logging.debug(f'[STATE: INGAME] Handle: {task=}')
         if task.type is DmicTaskType.CLOSE_APP:
             app_id = task.data
             self.cmd_close_game.execute(app_id)
             self.cmd_change_state.execute('inmenu')
 
         if task.type is DmicTaskType.APP_CRASHED:
-            # print('\n !!! [STATE: INGAME] Game crashed...', task.data)
+            logging.warning(f'\n [STATE: INGAME] Game crashed {task.data=}')
             app_id = task.data
             self.cmd_close_game.execute(app_id)
             self.cmd_change_state.execute('inmenu')

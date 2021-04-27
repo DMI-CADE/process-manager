@@ -1,7 +1,7 @@
+import time
+
 from abc import ABC, abstractmethod
 from ..tasks import DmicTask, DmicTaskType
-
-import time
 
 
 class DmicCommand(ABC):
@@ -39,25 +39,25 @@ class C_ChangeState(DmicCommand):
 
 class C_StartGame(DmicCommand):
     def execute(self, data):
-        # print('  [COMMAND: StartGame] Execute:', data)
+        logging.debug(f'[COMMAND: StartGame] Execute: {data=}')
         app_id = data
 
         if not self._pm.verify_closed(app_id):
-            # print('  [COMMAND: StartGame] game already running... closing game...')
+            logging.debug('[COMMAND: StartGame] game already running... closing game...')
             self._pm.close_app(app_id)
 
         for retry in range(3):
-            # print('  [COMMAND: StartGame] retry:', retry)
+            logging.debug(f'[COMMAND: StartGame] {retry=}'')
 
             self._pm.start_app(app_id)
             is_running = self._pm.verify_running(app_id)
 
             if not is_running:
-                # print('  [COMMAND: StartGame] not initialy verified as running...')
+                logging.debug('[COMMAND: StartGame] not initialy verified as running...')
                 time.sleep(1)
                 is_running = self._pm.verify_running(app_id)
 
-            # print('  [COMMAND: StartGame] is running:', is_running)
+            logging.debug(f'[COMMAND: StartGame] {is_running=}')
 
             if is_running:
                 break
@@ -65,7 +65,7 @@ class C_StartGame(DmicCommand):
 
 class C_CloseGame(DmicCommand):
     def execute(self, data):
-        # print('  [COMMAND: CloseGame] Execute:', data)
+        logging.debug(f'[COMMAND: CloseGame] Execute: {data=}')
         app_id = data
 
         self._pm.close_app(app_id)

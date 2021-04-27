@@ -1,5 +1,6 @@
 import json
 import subprocess
+import logging
 
 from ._applications import DmicAppNotRunningException, DmicAppNotConfiguredException, dmic_app_process_factory
 
@@ -42,6 +43,8 @@ class DmicApplicationHandler:
             self.apps_location = self.apps_config['_apps_location']
 
         self.running_apps = dict()
+        logging.debug(f'[APP HANDLER] {self.apps_config=}')
+        logging.debug(f'[APP HANDLER] {self.apps_location=}')
 
     def start_app(self, app_id):
         """Starts an app by its id.
@@ -58,8 +61,8 @@ class DmicApplicationHandler:
           DmicAppNotConfiguredException: If app is not configured correctly.
         """
 
-        # print('[APP HANDLER] Start app:', app_id)
-        # print('[APP HANDLER] current apps:', self.running_apps)
+        logging.debug(f'[APP HANDLER] Start app: {app_id}')
+        logging.debug(f'[APP HANDLER] {self.running_apps=}')
         app_config = self._get_app_config(app_id)
 
         # Stop/Remove if already present
@@ -71,25 +74,28 @@ class DmicApplicationHandler:
         app_process.crash_event += self._get_crash_callback_function(app_id)
 
         self.running_apps[app_id] = app_process
-        # print('[APP HANDLER] current apps:', self.running_apps)
+        logging.debug(f'[APP HANDLER] {self.running_apps=}')
 
     def verify_running(self, app_id):
         """Checks if a application is running"""
 
+        logging.debug(f'[APP HANDLER] Verify running: {app_id}')
+
         app_exists = app_id in self.running_apps
-        # print('[APP HANDLER] Verify running: app_exists:', app_exists)
+        logging.debug(f'[APP HANDLER] Verify running: {app_exists=}')
         app_process_is_running = False
         window_found = False
         if app_exists:
             app_process_is_running = self.running_apps[app_id].is_running()
-            # print('[APP HANDLER] Verify running: app_process_is_running:', app_process_is_running)
+            logging.debug(f'[APP HANDLER] Verify running: {app_process_is_running=}')
             try:
                 window_found = self._get_window_id(app_id) > 0
-                # print('[APP HANDLER] Verify running: window_found:', window_found)
+                logging.debug(f'[APP HANDLER] Verify running: {window_found=}')
             except DmicAppNotRunningException:
                 window_found = False
 
-        return app_exists and app_process_is_running and window_found
+        app_is_running = app_exists and app_process_is_running and window_found
+        return app_is_running
 
     def focus_app_sync(self, app_id):
         """Focuses application synchronously."""
@@ -98,7 +104,7 @@ class DmicApplicationHandler:
             window_term = self.running_apps[app_id].get_window_search_term()
             sp_check_output(self.CMD_FOCUS_WINDOW_SYNC % window_term)
         except subprocess.CalledProcessError as e:
-            print('[APP HANDLER] focus app subprocess error:', e)
+            logging.warning(f'[APP HANDLER] focus app subprocess error: {e}')
             return False
 
         return True
@@ -108,10 +114,11 @@ class DmicApplicationHandler:
 
         try:
             focused_window_id = int(sp_check_output(self.CMD_GET_FOCUSED_WINDOW_ID))
-            # print('[APP HANDLER] focused_window_id:', focused_window_id)
+            logging.debug(f'[APP HANDLER] {focused_window_id=}')
             app_window_id = self._get_window_id(app_id)
-            # print('[APP HANDLER] app_window_id:', app_window_id)
+            logging.debug(f'[APP HANDLER] {app_window_id=}')
         except DmicAppNotRunningException:
+            logging.warning(f'[APP HANDLER] Tried to verify focus of none running app: {app_id}')
             return False
 
         return focused_window_id == app_window_id
@@ -119,13 +126,13 @@ class DmicApplicationHandler:
     def close_app(self, app_id):
         """Closes an application."""
 
-        # print(f'[APP HANDLER] Close: {app_id}...')
+        logging.debug(f'[APP HANDLER] Close: {app_id}...')
         window_search_term = dmic_app_process_factory(app_id, self._get_app_config(app_id)).get_window_search_term()
         try:
-            # print(f'[APP HANDLER] Windowkill: {window_search_term}...')
+            logging.debug(f'[APP HANDLER] Windowkill: {window_search_term}...')
             sp_check_output(self.CMD_KILL_WINDOW % window_search_term)
         except subprocess.CalledProcessError as e:
-            print('[APP HANDLER] close app subprocess error:', e)
+            logging.warning(f'[APP HANDLER] close app subprocess error: {e}')
 
         if app_id in self.running_apps:
             self.running_apps[app_id].stop()

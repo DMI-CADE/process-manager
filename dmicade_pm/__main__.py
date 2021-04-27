@@ -1,9 +1,29 @@
+import sys
+import threading
+import logging
+
 from .processmanager import DmicProcessManager
 from .statemachine import DmicStateMachine
 from .tasks import DmicTaskType, DmicTask
 from .commands import DmicCommandPool
 from .uds_server import UdsServer
-import threading
+
+
+# Set default loglevel.
+numeric_log_level = getattr(logging, 'INFO', None)
+
+# Handle command line arguments.
+for arg in sys.argv:
+
+    # Set log level.
+    if arg.find('--log=') == 0:
+        loglevel = arg[6:]
+        numeric_log_level = getattr(logging, loglevel.upper(), None)
+        if not isinstance(numeric_log_level, int):
+            raise ValueError('Invalid log level: %s' % loglevel)
+
+logging.basicConfig(level=numeric_log_level,
+                    format='%(asctime)s - (%(threadName)-9s) %(levelname)s:%(name)s:%(filename)s: %(message)s',)
 
 
 def main():
@@ -33,11 +53,22 @@ class Client:
         self._state_machine.queue_task_for_state(task)
 
     def _debug(self):
+
+        input('...')
+        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.START_APP, 'alien-soldier'))
+        input('...')
+        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.CLOSE_APP, 'alien-soldier'))
+        input('...')
+        self._state_machine.stop_event_loop()
+
+        return
+
         user_input = ''
         states = ['start', 'test']
         state = 0
 
-        check_input = lambda x: user_input[:len(x)] == x
+        def check_input(x):
+            return user_input[:len(x)] == x
 
         while not check_input('exit'):
             user_input = input()
@@ -53,5 +84,6 @@ class Client:
                 self.queue_state_task(DmicTask(DmicTaskType.CHANGE_STATE, states[state]))
 
         self._state_machine.stop_event_loop()
+
 
 main()

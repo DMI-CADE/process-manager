@@ -53,6 +53,7 @@ class UdsServer:
 
         # Start receive when connected.
         self._receive_thread = threading.Thread(target=self._receive_continuous)
+        self._receive_thread.name('receive_thread')
         self.connected_event += lambda arg: self._receive_thread.start()
 
     def start(self):
@@ -84,7 +85,7 @@ class UdsServer:
                 self._client_conn.shutdown(socket.SHUT_WR)
                 self._client_conn.close()
             except socket.error as e:
-                # print('[UDS SERVER] Shutdown failed.')
+                logging.debug('[UDS SERVER] Shutdown failed.')
                 pass
 
             self._connected = False
@@ -138,17 +139,17 @@ class UdsServer:
 
                 # Close server when msg length of 0 is received indication a closed connection.
                 if len(msg) == 0:
-                    # print('[UDS SERVER] Connection closed by remote host.')
+                    logging.info('[UDS SERVER] Connection closed by remote host.')
                     self.close()
                     break
 
+                logging.info(f'[UDS SERVER] Received: {msg=}')
                 self.received_event.update(msg)
 
             except socket.timeout:
                 continue
             except socket.error as e:
-                # print('[UDS SERVER] receive exception raised:')
-                # print(e)
+                logging.exception(f'[UDS SERVER] receive exception raised: {e}')
                 self.close()
 
     def is_connected(self):

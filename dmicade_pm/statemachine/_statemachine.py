@@ -28,16 +28,20 @@ class DmicStateMachine:
 
         while self._is_running:
             if len(self._task_queue) > 0:
+                logging.debug(f"""[STATEM] Task is queued:\n |- {self._current_state=}\n |- Tasks: {[n.type for n in self._task_queue]}""")
                 task_is_ready = self._ready_task_buffer()
 
                 if task_is_ready:
+                    logging.debug('[STATEM] Execute Task...')
                     self._execute_next_task()
+                    logging.debug('[STATEM] Task Done!')
 
     def stop_event_loop(self):
         """Stops event loop.
 
         Tells the event loop to exit after executing current task."""
 
+        logging.info('[STATEM] Stop event loop...')
         self._is_running = False
 
     def queue_task_for_state(self, task: DmicTask):
@@ -48,12 +52,15 @@ class DmicStateMachine:
             The task to queue.
         """
 
+        logging.debug(f'[STATEM] Queue {task=}')
         self._task_queue.append(task)
+        logging.debug(f'[STATEM] {self._task_queue=}')
 
     def _execute_next_task(self):
         """Handles execution of the next queued task."""
 
         current_task = self._task_queue[0]
+        logging.info(f'[STATEM] Execute Task: {current_task}')
 
         if current_task.type is DmicTaskType.CHANGE_STATE:
             self._change_state(current_task.data)
@@ -62,12 +69,17 @@ class DmicStateMachine:
             self._current_state.handle(current_task)
 
         self._task_queue.remove(current_task)
+        logging.debug(f'[STATEM] Removed task, new queue: {[n.type for n in self._task_queue]})
 
     def _change_state(self, state_name: str):
         """Handles steps to change to the next state."""
 
+        logging.debug('[STATEM] Exit state...')
         self._current_state.exit()
+
+        logging.info(f'[STATEM] Change state to {state_name}')
         self._current_state = self._state_pool.get_object(state_name)
+        logging.debug(f'[STATEM] Enter state: {self._current_state}')
         self._current_state.enter()
 
     def _ready_task_buffer(self):
