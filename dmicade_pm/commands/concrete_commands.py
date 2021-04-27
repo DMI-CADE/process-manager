@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from ..statemachine._tasks import DmicTask, DmicTaskType
+from ..tasks import DmicTask, DmicTaskType
 
 import time
+
 
 class DmicCommand(ABC):
     """Abstract class for Dmic commands."""

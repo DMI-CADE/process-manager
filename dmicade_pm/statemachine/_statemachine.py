@@ -1,5 +1,5 @@
 from ._states import DmicStatePool
-from ._tasks import DmicTask, DmicTaskType
+from ..tasks import DmicTask, DmicTaskType
 
 
 class DmicStateMachine:

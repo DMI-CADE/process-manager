@@ -1,5 +1,6 @@
 from .processmanager import DmicProcessManager
-from .statemachine import DmicStateMachine, DmicTaskType, DmicTask
+from .statemachine import DmicStateMachine
+from .tasks import DmicTaskType, DmicTask
 from .commands import DmicCommandPool
 from .uds_server import UdsServer
 import threading

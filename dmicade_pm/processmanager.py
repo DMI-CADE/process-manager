@@ -1,4 +1,4 @@
-from .statemachine import DmicTask, DmicTaskType
+from .tasks import DmicTask, DmicTaskType
 from .application_handler import DmicApplicationHandler
 
 

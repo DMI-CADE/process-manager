@@ -1,6 +1,6 @@
 from abc import ABC
 from ..helper import ObjectPool
-from ._tasks import DmicTask, DmicTaskType
+from ..tasks import DmicTask, DmicTaskType
 from ..commands import DmicCommandPool
 
 
