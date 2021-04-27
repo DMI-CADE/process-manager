@@ -46,19 +46,25 @@ class DmicStatePool(ObjectPool):
 class S_Test(DmicState):
 
     def enter(self):
-        print('[TEST STATE]: Enter')
+        logging.debug('[TEST STATE]: Enter')
 
     def handle(self, task: DmicTask):
-        print('[TEST STATE]: Handle:', task)
+        logging.debug(f'[TEST STATE]: Handle: {task=}')
         if task.type is DmicTaskType.TEST:
             self.command_pool.invoke_command('test', task.data)
 
     def exit(self):
-        print('[TEST STATE]: Exit')
+        logging.debug('[TEST STATE]: Exit')
 
 
 class S_Start(DmicState):
-    pass
+    def __init__(self, command_pool):
+        super().__init__(command_pool)
+        self.cmd_change_state = command_pool.get_object('changestate')
+
+    def enter(self):
+        logging.debug('[STATE: START] Enter.')
+        self.cmd_change_state.execute('inmenu')
 
 
 class S_InMenu(DmicState):
