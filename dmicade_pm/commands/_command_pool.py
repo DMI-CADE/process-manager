@@ -11,7 +11,7 @@ class DmicCommandPool(ObjectPool):
 
     def __init__(self, process_manager):
         super().__init__(globals(), DmicCommand, self.COMMAND_PREFIX, process_manager, self)
-        logging.debug(f'[COMMAND POOL] {self._pool=}))
+        logging.debug(f'[COMMAND POOL] {self._pool=})')
 
     def invoke_command(self, command_id, data):
         """Invokes a command in the command pool.

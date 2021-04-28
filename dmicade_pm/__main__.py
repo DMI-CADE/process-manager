@@ -44,6 +44,7 @@ class Client:
         print('[PM CLIENT] Start')
 
         t = threading.Thread(target=self._debug, daemon=True)
+        t.name = 'debug_thread'
         t.start()
 
         self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.TEST, ':)'))
@@ -54,11 +55,11 @@ class Client:
 
     def _debug(self):
 
-        input('...')
+        input('...\n')
         self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.START_APP, 'alien-soldier'))
-        input('...')
+        input('...\n')
         self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.CLOSE_APP, 'alien-soldier'))
-        input('...')
+        input('...\n')
         self._state_machine.stop_event_loop()
 
         return

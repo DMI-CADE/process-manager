@@ -3,6 +3,7 @@ import os.path
 import socket
 import threading
 import warnings
+import logging
 
 from .helper import DmicEvent
 
@@ -53,7 +54,7 @@ class UdsServer:
 
         # Start receive when connected.
         self._receive_thread = threading.Thread(target=self._receive_continuous)
-        self._receive_thread.name('receive_thread')
+        self._receive_thread.name = 'receive_thread'
         self.connected_event += lambda arg: self._receive_thread.start()
 
     def start(self):

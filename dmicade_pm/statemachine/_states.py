@@ -1,3 +1,5 @@
+import logging
+
 from abc import ABC
 from ..helper import ObjectPool
 from ..tasks import DmicTask, DmicTaskType

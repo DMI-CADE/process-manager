@@ -1,4 +1,5 @@
 import time
+import logging
 
 from abc import ABC, abstractmethod
 from ..tasks import DmicTask, DmicTaskType
@@ -47,7 +48,7 @@ class C_StartGame(DmicCommand):
             self._pm.close_app(app_id)
 
         for retry in range(3):
-            logging.debug(f'[COMMAND: StartGame] {retry=}'')
+            logging.debug(f'[COMMAND: StartGame] {retry=}')
 
             self._pm.start_app(app_id)
             is_running = self._pm.verify_running(app_id)

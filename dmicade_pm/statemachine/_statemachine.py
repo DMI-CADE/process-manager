@@ -1,3 +1,5 @@
+import logging
+
 from ._states import DmicStatePool
 from ..tasks import DmicTask, DmicTaskType
 
@@ -52,9 +54,9 @@ class DmicStateMachine:
             The task to queue.
         """
 
-        logging.debug(f'[STATEM] Queue {task=}')
+        logging.debug(f'[STATEM] Queue: {task.type}, {task.data=}')
         self._task_queue.append(task)
-        logging.debug(f'[STATEM] {self._task_queue=}')
+        logging.debug(f'[STATEM] {[n.type for n in self._task_queue]}')
 
     def _execute_next_task(self):
         """Handles execution of the next queued task."""
@@ -69,7 +71,7 @@ class DmicStateMachine:
             self._current_state.handle(current_task)
 
         self._task_queue.remove(current_task)
-        logging.debug(f'[STATEM] Removed task, new queue: {[n.type for n in self._task_queue]})
+        logging.debug(f'[STATEM] Removed task, new queue: {[n.type for n in self._task_queue]}')
 
     def _change_state(self, state_name: str):
         """Handles steps to change to the next state."""
@@ -77,7 +79,7 @@ class DmicStateMachine:
         logging.debug('[STATEM] Exit state...')
         self._current_state.exit()
 
-        logging.info(f'[STATEM] Change state to {state_name}')
+        logging.info(f'[STATEM] Change state to {state_name}.')
         self._current_state = self._state_pool.get_object(state_name)
         logging.debug(f'[STATEM] Enter state: {self._current_state}')
         self._current_state.enter()
