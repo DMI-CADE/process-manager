@@ -42,7 +42,7 @@ class DmicApp(ABC):
     def stop(self):
         self._should_be_running = False
 
-        logging.debug(f'[DMICAPP] Terminate:{self.app_id}')
+        logging.debug(f'[DMICAPP] Terminate: {self.app_id}')
         self.sub_process.terminate()
 
     def is_running(self):
