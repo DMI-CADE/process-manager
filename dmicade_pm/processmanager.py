@@ -39,11 +39,8 @@ class DmicProcessManager:
     def verify_closed(self, app_id):
         return self._app_handler.verify_closed(app_id)
 
-    def set_timer(self, time):
-        pass
-
-    def get_elapsed_time(self):
-        pass
+    def set_timer(self, seconds):
+        self._timer.set_timer(seconds)
 
     def stop_timer(self):
-        pass
+        self._timer.stop()
