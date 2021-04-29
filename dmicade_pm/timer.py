@@ -1,0 +1,2 @@
+class DmicTimer:
+    pass
