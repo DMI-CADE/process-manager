@@ -1,15 +1,15 @@
 from .tasks import DmicTask, DmicTaskType
 from .application_handler import DmicApplicationHandler
-
+from .timer import DmicTimer
 
 class DmicProcessManager:
     """Facade for controlling process manager components."""
 
-    def __init__(self, client, uds_server, timer):
+    def __init__(self, client, uds_server):
         self._client = client
         self._app_handler = DmicApplicationHandler(self)
         self._uds_server = uds_server
-        self._timer = timer
+        self._timer = DmicTimer()
 
     def send_to_ui(self, msg: str):
         self._uds_server.send(msg)

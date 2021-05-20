@@ -7,7 +7,6 @@ from .statemachine import DmicStateMachine
 from .tasks import DmicTaskType, DmicTask
 from .commands import DmicCommandPool
 from .uds_server import UdsServer
-from .timer import DmicTimer
 
 
 # Set default loglevel.
@@ -37,8 +36,7 @@ class Client:
 
     def __init__(self):
         self._uds_server = UdsServer(self.SOCKET_PATH)
-        self._timer = DmicTimer()
-        self._process_manager = DmicProcessManager(self, self._uds_server, self._timer)
+        self._process_manager = DmicProcessManager(self, self._uds_server)
         self._command_pool = DmicCommandPool(self._process_manager)
         self._state_machine = DmicStateMachine(self._command_pool)
 
