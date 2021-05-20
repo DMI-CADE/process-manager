@@ -62,7 +62,7 @@ class DmicStateMachine:
         """Handles execution of the next queued task."""
 
         current_task = self._task_queue[0]
-        logging.info(f'[STATEM] Execute Task: {current_task}')
+        logging.info(f'[STATEM] Execute Task: {current_task.type.name}, {current_task.data}')
 
         if current_task.type is DmicTaskType.CHANGE_STATE:
             self._change_state(current_task.data)
