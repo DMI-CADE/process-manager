@@ -24,10 +24,10 @@ class DmicApplicationHandler:
     """Default apps config file path."""
     APPS_CONFIG_FILE_PATH = './dmicade_pm/application_handler/apps_config.json'
 
-    CMD_GET_FOCUSED_WINDOW_ID = 'xdotool getactivewindow'
-    CMD_SEARCH_WINDOW = 'xdotool search --onlyvisible %s | head -n1'  # Only returns first found id.
-    CMD_FOCUS_WINDOW_SYNC = 'xdotool search --onlyvisible %s windowactivate --sync'
-    CMD_KILL_WINDOW = 'xdotool search --onlyvisible %s windowkill'
+    CMD_GET_FOCUSED_WINDOW_ID   = 'xdotool getactivewindow'
+    CMD_SEARCH_WINDOW           = 'xdotool search --onlyvisible %s | head -n1'  # Only returns first found id.
+    CMD_FOCUS_WINDOW_SYNC       = 'xdotool search --onlyvisible %s windowactivate --sync'
+    CMD_KILL_WINDOW             = 'xdotool search --onlyvisible %s windowkill'
 
     def __init__(self, process_manager, apps_location=''):
         """Constructor for class DmicApplicationHandler"""
@@ -69,6 +69,7 @@ class DmicApplicationHandler:
         if app_id in self.running_apps:
             self.running_apps[app_id].stop()
 
+        # Create process
         app_process = dmic_app_process_factory(app_id, app_config)
         app_process.run(self.apps_config['_apps_location'])
         app_process.crash_event += self._get_crash_callback_function(app_id)
@@ -77,7 +78,7 @@ class DmicApplicationHandler:
         logging.debug(f'[APP HANDLER] {self.running_apps=}')
 
     def verify_running(self, app_id):
-        """Checks if a application is running"""
+        """Checks if a application is running."""
 
         logging.debug(f'[APP HANDLER] Verify running: {app_id}')
 
@@ -168,8 +169,12 @@ class DmicApplicationHandler:
         return window_id
 
     def _get_crash_callback_function(self, app_id):
+        """Returns function that queues a crash notification via the process manager."""
+
         return lambda arg: self.process_manager.queue_crash_notification(app_id)
 
 
 def sp_check_output(cmd):
+    """Runs given command in a subprocess and returns the output."""
+
     return subprocess.check_output(cmd, shell=True)

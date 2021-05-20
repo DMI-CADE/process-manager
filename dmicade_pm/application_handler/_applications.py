@@ -22,6 +22,17 @@ class DmicApp(ABC):
         self._should_be_running = False
 
     def run(self, apps_path):
+        """Starts the app.
+
+        Starts the app by executing the _start_app function of the
+        child.
+        Starts a thread wich checks for crashes.
+
+        Args:
+          apps_path: string
+            Main media directory.
+        """
+
         logging.debug('[DMICAPP] Run...')
         self.sub_process = self._start_app(apps_path)
 
@@ -33,6 +44,11 @@ class DmicApp(ABC):
         self._should_be_running = True
 
     def _wait_for_crash(self):
+        """Synchronously waits until the suporcess closes.
+
+        Updates crash event when app is supposed to be running.
+        """
+
         self.sub_process.wait()
 
         if self._should_be_running:
@@ -50,10 +66,16 @@ class DmicApp(ABC):
 
     @abstractmethod
     def _start_app(self, apps_path) -> subprocess.Popen:
+        """Starts the app in a subprocess.
+
+        Returns:
+          The supprocess the app is running in.
+        """
         pass
 
     @abstractmethod
     def get_window_search_term(self) -> str:
+        """Returns a string that can be used to identify the app window."""
         pass
 
 
@@ -116,4 +138,5 @@ def dmic_app_process_factory(app_id, app_config) -> DmicApp:
             raise DmicAppNotConfiguredException(app_config)
     except ValueError:
         raise DmicAppNotConfiguredException(app_config)
+
     return new_app_process
