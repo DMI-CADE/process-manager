@@ -7,6 +7,7 @@ from .statemachine import DmicStateMachine
 from .tasks import DmicTaskType, DmicTask
 from .commands import DmicCommandPool
 from .uds_server import UdsServer
+from .config_loader import DmicConfigLoader
 
 
 # Set default loglevel.
@@ -27,16 +28,17 @@ logging.basicConfig(level=numeric_log_level,
 
 
 def main():
-    client = Client()
+    client = Client('/media/sf_vm_shared_folder/dmic-apps/')
     client.start()
 
 
 class Client:
     SOCKET_PATH = '/tmp/dmicade_socket.s'
 
-    def __init__(self):
+    def __init__(self, applications_location):
+        self._config_loader = DmicConfigLoader(applications_location)
         self._uds_server = UdsServer(self.SOCKET_PATH)
-        self._process_manager = DmicProcessManager(self, self._uds_server)
+        self._process_manager = DmicProcessManager(self, self._uds_server, self._config_loader)
         self._command_pool = DmicCommandPool(self._process_manager)
         self._state_machine = DmicStateMachine(self._command_pool)
 
@@ -56,9 +58,9 @@ class Client:
     def _debug(self):
 
         input('...\n')
-        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.START_APP, 'alien-soldier'))
+        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.START_APP, 'example-app'))
         input('...\n')
-        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.CLOSE_APP, 'alien-soldier'))
+        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.CLOSE_APP, 'example-app'))
         input('...\n')
         self._state_machine.stop_event_loop()
 

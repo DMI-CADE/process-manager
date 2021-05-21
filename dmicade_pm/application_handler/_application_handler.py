@@ -14,37 +14,23 @@ class DmicApplicationHandler:
     Attributes:
       apps_config : dict
         Application configurations loaded from the config file.
-      apps_location : str
-        Path to where the application folders are located. Uses default
-        when '_apps_location' not set in config file.
+      config_loader : DmicConfigLoader
+        A config loader for retrieving app configs.
       running_apps : dict
         Currently running DmicApp instances with their app id as keys.
     """
-
-    """Default apps config file path."""
-    APPS_CONFIG_FILE_PATH = './dmicade_pm/application_handler/apps_config.json'
 
     CMD_GET_FOCUSED_WINDOW_ID   = 'xdotool getactivewindow'
     CMD_SEARCH_WINDOW           = 'xdotool search --onlyvisible %s | head -n1'  # Only returns first found id.
     CMD_FOCUS_WINDOW_SYNC       = 'xdotool search --onlyvisible %s windowactivate --sync'
     CMD_KILL_WINDOW             = 'xdotool search --onlyvisible %s windowkill'
 
-    def __init__(self, process_manager, apps_location=''):
+    def __init__(self, process_manager, config_loader):
         """Constructor for class DmicApplicationHandler"""
 
         self.process_manager = process_manager
-
-        self.apps_config = dict()
-        with open(self.APPS_CONFIG_FILE_PATH) as json_file:
-            self.apps_config = json.load(json_file)
-
-        self.apps_location = apps_location
-        if not apps_location:
-            self.apps_location = self.apps_config['_apps_location']
-
+        self._config_loader = config_loader
         self.running_apps = dict()
-        logging.debug(f'[APP HANDLER] {self.apps_config=}')
-        logging.debug(f'[APP HANDLER] {self.apps_location=}')
 
     def start_app(self, app_id):
         """Starts an app by its id.
@@ -63,7 +49,7 @@ class DmicApplicationHandler:
 
         logging.debug(f'[APP HANDLER] Start app: {app_id}')
         logging.debug(f'[APP HANDLER] {self.running_apps=}')
-        app_config = self._get_app_config(app_id)
+        app_config = self._config_loader.configs[app_id]
 
         # Stop/Remove if already present
         if app_id in self.running_apps:
@@ -71,7 +57,7 @@ class DmicApplicationHandler:
 
         # Create process
         app_process = dmic_app_process_factory(app_id, app_config)
-        app_process.run(self.apps_config['_apps_location'])
+        app_process.run(self._config_loader.apps_path)
         app_process.crash_event += self._get_crash_callback_function(app_id)
 
         self.running_apps[app_id] = app_process
@@ -128,7 +114,7 @@ class DmicApplicationHandler:
         """Closes an application."""
 
         logging.debug(f'[APP HANDLER] Close: {app_id}...')
-        window_search_term = dmic_app_process_factory(app_id, self._get_app_config(app_id)).get_window_search_term()
+        window_search_term = dmic_app_process_factory(app_id, self._config_loader.configs[app_id]).get_window_search_term()
         try:
             logging.debug(f'[APP HANDLER] Windowkill: {window_search_term}...')
             sp_check_output(self.CMD_KILL_WINDOW % window_search_term)
@@ -142,7 +128,7 @@ class DmicApplicationHandler:
     def verify_closed(self, app_id):
         """Checks if an application is closed."""
 
-        window_search_term = dmic_app_process_factory(app_id, self._get_app_config(app_id)).get_window_search_term()
+        window_search_term = dmic_app_process_factory(app_id, self._config_loader.configs[app_id]).get_window_search_term()
         found_window = sp_check_output(self.CMD_SEARCH_WINDOW % window_search_term)
         return len(found_window) == 0
 

@@ -5,9 +5,10 @@ from .timer import DmicTimer
 class DmicProcessManager:
     """Facade for controlling process manager components."""
 
-    def __init__(self, client, uds_server):
+    def __init__(self, client, uds_server, config_loader):
         self._client = client
-        self._app_handler = DmicApplicationHandler(self)
+        self._config_loader = config_loader
+        self._app_handler = DmicApplicationHandler(self, config_loader)
         self._uds_server = uds_server
         self._timer = DmicTimer()
 
