@@ -45,6 +45,13 @@ class Client:
     def start(self):
         print('[PM CLIENT] Start')
 
+        # self._process_manager._timer.alert_event += lambda x: print('--------- jeff')
+        # self._process_manager._timer.set_timer(3)
+        # input('...\n')
+        # self._process_manager._timer.reset()
+        # input('...\n')
+        # return
+
         t = threading.Thread(target=self._debug, daemon=True)
         t.name = 'debug_thread'
         t.start()

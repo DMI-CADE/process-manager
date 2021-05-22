@@ -27,12 +27,15 @@ class ObjectPool:
         the given prefix in lowercase."""
 
         self._pool = dict()
+        # print(f'make object pool:\n{_globals}\n{parent_class}\n{object_class_prefix}\n{args}')
 
         for key in _globals:
             # Skip non classes and state parent.
+            # print(key, not isinstance(_globals[key], type), _globals[key] == parent_class)
             if not isinstance(_globals[key], type) or _globals[key] == parent_class:
                 continue
 
+            # print('-', issubclass(_globals[key], parent_class))
             if issubclass(_globals[key], parent_class):
                 state_id = key
                 if state_id.startswith(object_class_prefix):
@@ -40,6 +43,7 @@ class ObjectPool:
                     state_id = state_id[len(object_class_prefix):]
 
                 state_id = state_id.lower()
+                # print('-', state_id)
                 if state_id in self._pool:
                     raise Exception('[OBJECT POOL] Multiple objects have the same name...')
 

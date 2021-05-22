@@ -30,7 +30,14 @@ class DmicConfigLoader:
         logging.debug(f'[CONFIG LOADER] Configured apps: {self.configs.keys()}')
 
     def load_configs(self, path: str):
-        """TODO"""
+        """Loads all app configs into the configs member variable.
+
+        An apps config is only loaded when a config.json with required properties existst.
+
+        Args:
+          apps_path:
+            The folder directory in which th dmic apps are located.
+        """
 
         configs = dict()
 
@@ -62,7 +69,7 @@ class DmicConfigLoader:
         return configs
 
     def validate_config(self, config) -> bool:
-        """TODO
+        """Validates the given config based on its type property.
         
         TODO make universal and recursive 
         """
