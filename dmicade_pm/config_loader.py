@@ -81,6 +81,10 @@ class DmicConfigLoader:
                 req_props = ['type', 'media', 'exe']
             elif config['type'] == 'mame_rom':
                 req_props = ['type', 'media', 'command']
+            else:
+                config_type = config['type']
+                logging.warning(f'[CONFIG LOADER] Unknown application type "{config_type}"...')
+                return False
 
             for prop in req_props:
                 if prop not in config:
