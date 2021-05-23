@@ -64,10 +64,11 @@ class Client:
 
     def _debug(self):
 
+        app_name = 'alien-soldier'
         input('...\n')
-        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.START_APP, 'example-app'))
+        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.START_APP, app_name))
         input('...\n')
-        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.CLOSE_APP, 'example-app'))
+        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.CLOSE_APP, app_name))
         input('...\n')
         self._state_machine.stop_event_loop()
 

@@ -66,7 +66,7 @@ class DmicApplicationHandler:
     def verify_running(self, app_id):
         """Checks if a application is running."""
 
-        logging.debug(f'[APP HANDLER] Verify running: {app_id}')
+        logging.debug(f'[APP HANDLER] Verify running: {app_id=}')
 
         app_exists = app_id in self.running_apps
         logging.debug(f'[APP HANDLER] Verify running: {app_exists=}')

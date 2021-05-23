@@ -39,6 +39,8 @@ class C_ChangeState(DmicCommand):
 
 
 class C_StartGame(DmicCommand):
+    START_TRIES = 3
+
     def execute(self, data):
         logging.debug(f'[COMMAND: StartGame] Execute: {data=}')
         app_id = data
@@ -47,7 +49,7 @@ class C_StartGame(DmicCommand):
             logging.debug('[COMMAND: StartGame] game already running... closing game...')
             self._pm.close_app(app_id)
 
-        for retry in range(3):
+        for retry in range(self.START_TRIES):
             logging.debug(f'[COMMAND: StartGame] {retry=}')
 
             self._pm.start_app(app_id)

@@ -39,6 +39,7 @@ class DmicApp(ABC):
         self._crash_check_thread = threading.Thread(
             target=self._wait_for_crash,
             daemon=True)
+        self._crash_check_thread.name = f'{self.app_id}-CrashCheckThread'
         self._crash_check_thread.start()
 
         self._should_be_running = True
@@ -90,8 +91,11 @@ class DmicAppMameRom(DmicApp):
         if 'command' not in self.app_config:
             raise DmicAppNotConfiguredException(self.app_id)
 
-        cmd = self.app_config['command'].split()
-        return subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        cmd = self.app_config['command']
+        cmd = cmd.replace('%%path%%', apps_path)
+        logging.debug(f'[DMICAPP MAME] Run: {cmd}')
+
+        return subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
 
 
 class DmicAppExecutable(DmicApp):
