@@ -17,7 +17,7 @@ CONFIG_REQUIREMENTS = {
             "logo": "str"
         },
         "type": "str",
-        "command": "str"
+        "command": "str" # %%path%% gets replaced with the dmic app location
     }
 }
 

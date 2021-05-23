@@ -22,7 +22,8 @@ class DmicStateMachine:
         """Runs synchronous state machine loop.
 
         Waits for tasks to be queued, manages queued tasks and hands
-        them to the current state to handle."""
+        them to the current state to handle.
+        """
 
         self._is_running = True
 
@@ -41,7 +42,8 @@ class DmicStateMachine:
     def stop_event_loop(self):
         """Stops event loop.
 
-        Tells the event loop to exit after executing current task."""
+        Tells the event loop to exit after executing current task.
+        """
 
         logging.info('[STATEM] Stop event loop...')
         self._is_running = False
