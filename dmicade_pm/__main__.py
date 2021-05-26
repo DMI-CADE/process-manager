@@ -2,6 +2,7 @@ import sys
 import threading
 import logging
 
+from .helper import parse_command_line_arguments
 from .processmanager import DmicProcessManager
 from .statemachine import DmicStateMachine
 from .tasks import DmicTaskType, DmicTask
@@ -28,15 +29,17 @@ logging.basicConfig(level=numeric_log_level,
 
 
 def main():
-    client = Client('/media/sf_vm_shared_folder/dmic-apps/')
+    print(__import__('os').getcwd())
+    parsed_args = parse_command_line_arguments(sys.argv)
+    client = Client(parsed_args)
     client.start()
 
 
 class Client:
     SOCKET_PATH = '/tmp/dmicade_socket.s'
 
-    def __init__(self, applications_location):
-        self._config_loader = DmicConfigLoader(applications_location)
+    def __init__(self, user_args):
+        self._config_loader = DmicConfigLoader(user_args)
         self._uds_server = UdsServer(self.SOCKET_PATH)
         self._process_manager = DmicProcessManager(self, self._uds_server, self._config_loader)
         self._command_pool = DmicCommandPool(self._process_manager)

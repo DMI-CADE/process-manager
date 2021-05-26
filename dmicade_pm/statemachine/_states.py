@@ -113,7 +113,7 @@ class S_InGame(DmicState):
             self.cmd_change_state.execute('inmenu')
 
         elif task.type is DmicTaskType.APP_CRASHED:
-            logging.warning(f'\n [STATE: INGAME] Game crashed {task.data=}')
+            logging.warning(f'[STATE: INGAME] Game crashed {task.data=}\n')
             app_id = task.data
             self.cmd_close_game.execute(app_id)
             self.cmd_change_state.execute('inmenu')

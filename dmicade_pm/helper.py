@@ -1,3 +1,31 @@
+import re
+
+def parse_command_line_arguments(cl_args):
+    """Parses argument list into key value pairs.
+
+    Parses given arguments into key value pair when given in form of:
+    --<key>=<value>
+    --<key>="<value>"
+    --<key>='<value>'
+
+    Args:
+      cl_args:
+        Itarable containing strings of user arguments.
+
+    Returns:
+      Dictonary of key value pairs of matching user arguments.
+    """
+
+    user_args = dict()
+
+    for arg in cl_args:
+        match = re.match(r'--(?P<arg>\S+)\=(?P<value>[\"\']?\S+[\"\']?)', arg)
+        if match:
+            user_args[match.group('arg')] = match.group('value')
+
+    return user_args
+
+
 class DmicException(Exception):
     """Base class for exceptions in this module."""
     pass
