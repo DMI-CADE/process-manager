@@ -90,6 +90,14 @@ class S_InMenu(DmicState):
     def exit(self):
         logging.debug('[STATE: INMENU] Exit')
 
+class S_Idle(DmicState):
+    def __init__(self, command_pool):
+        super().__init__(command_pool)
+        self.cmd_change_state = command_pool.get_object('changestate')
+
+    def handle(self, task):
+        if task.type is DmicTaskType.INTERACTION:
+            self.cmd_change_state.execute('inmenu')
 
 class S_InGame(DmicState):
     def __init__(self, command_pool):
@@ -104,7 +112,7 @@ class S_InGame(DmicState):
             self.cmd_close_game.execute(app_id)
             self.cmd_change_state.execute('inmenu')
 
-        if task.type is DmicTaskType.APP_CRASHED:
+        elif task.type is DmicTaskType.APP_CRASHED:
             logging.warning(f'\n [STATE: INGAME] Game crashed {task.data=}')
             app_id = task.data
             self.cmd_close_game.execute(app_id)

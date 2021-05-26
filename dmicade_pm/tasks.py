@@ -3,6 +3,7 @@ from enum import Enum, auto
 
 class DmicTaskType(Enum):
     TEST = auto()
+    INTERACTION = auto()
     CHANGE_STATE = auto()
     START_APP = auto()
     CLOSE_APP = auto()
