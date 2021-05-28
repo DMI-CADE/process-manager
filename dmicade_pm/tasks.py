@@ -8,6 +8,7 @@ class DmicTaskType(Enum):
     START_APP = auto()
     CLOSE_APP = auto()
     APP_CRASHED = auto()
+    TIMEOUT = auto()
 
 
 class DmicTask:

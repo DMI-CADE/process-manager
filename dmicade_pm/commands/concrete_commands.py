@@ -44,6 +44,7 @@ class C_StartGame(DmicCommand):
     def execute(self, data):
         logging.debug(f'[COMMAND: StartGame] Execute: {data=}')
         app_id = data
+        is_running = False
 
         if not self._pm.verify_closed(app_id):
             logging.debug('[COMMAND: StartGame] game already running... closing game...')
@@ -65,6 +66,8 @@ class C_StartGame(DmicCommand):
             if is_running:
                 break
 
+        return is_running
+
 
 class C_CloseGame(DmicCommand):
     def execute(self, data):
@@ -72,3 +75,13 @@ class C_CloseGame(DmicCommand):
         app_id = data
 
         self._pm.close_app(app_id)
+
+        is_closed = self._pm.verify_closed(app_id)
+        return is_closed
+
+class C_SendToUI(DmicCommand):
+    def execute(self, data):
+        logging.debug(f'[COMMAND: SendToUI] Execute: {data=}')
+        bytes_sent = self._pm.send_to_ui(data)
+
+        return bytes_sent > 0
