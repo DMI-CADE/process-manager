@@ -8,6 +8,7 @@ from .statemachine import DmicStateMachine
 from .tasks import DmicTaskType, DmicTask
 from .commands import DmicCommandPool
 from .uds_server import UdsServer
+from .message_parser import DmicMessageParser
 from .config_loader import DmicConfigLoader
 
 
@@ -41,26 +42,41 @@ class Client:
     def __init__(self, user_args):
         self._config_loader = DmicConfigLoader(user_args)
         self._uds_server = UdsServer(self.SOCKET_PATH)
+        self._message_parser = DmicMessageParser(self._uds_server)
         self._process_manager = DmicProcessManager(self, self._uds_server, self._config_loader)
         self._command_pool = DmicCommandPool(self._process_manager)
         self._state_machine = DmicStateMachine(self._command_pool)
 
+        self._message_parser.received_task_event += self.queue_state_task
+
     def start(self):
         print('[PM CLIENT] Start')
+
+        #self._uds_server.connected_event += lambda x: print('[Client] udsServer: Connected!')
+        #self._uds_server.received_event += lambda msg: print('[Client] udsServer: Received: ', msg)
+        #self._uds_server.disconnected_event += lambda x: print('[Client] udsServer: Disconnected...')
+
+        self._uds_server.start()
+
+        #while not self._uds_server.is_connected():
+            #pass
 
         # self._process_manager._timer.alert_event += lambda x: print('--------- jeff')
         # self._process_manager._timer.set_timer(3)
         # input('...\n')
         # self._process_manager._timer.reset()
-        # input('...\n')
-        # return
+        #input('...\n')
+        #self._uds_server.close()
+        #return
 
         t = threading.Thread(target=self._debug, daemon=True)
         t.name = 'debug_thread'
-        t.start()
+        # t.start()
 
-        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.TEST, ':)'))
+        # self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.TEST, ':)'))
         self._state_machine.run_event_loop_sync()
+
+        self._uds_server.close()
 
     def queue_state_task(self, task: DmicTask):
         self._state_machine.queue_task_for_state(task)

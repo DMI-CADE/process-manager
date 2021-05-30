@@ -49,6 +49,7 @@ class UdsServer:
 
         self._server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         if os.path.exists(self._socket_path):
+            logging.debug('[UDS SERVER] Deleting old socket file...')
             os.remove(self._socket_path)
         self._server_socket.bind(self._socket_path)
 
@@ -144,7 +145,7 @@ class UdsServer:
                     self.close()
                     break
 
-                logging.info(f'[UDS SERVER] Received: {msg=}')
+                logging.debug(f'[UDS SERVER] Received: {msg=}')
                 self.received_event.update(msg)
 
             except socket.timeout:

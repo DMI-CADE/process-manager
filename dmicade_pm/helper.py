@@ -32,6 +32,7 @@ class DmicException(Exception):
 
 
 class DmicEvent:
+    """TODO"""
 
     def __init__(self):
         self._subs = []
