@@ -57,7 +57,7 @@ class DmicConfigLoader:
                 default_pm_config = json.load(json_file)
                 pm_config = default_pm_config
         except:
-            print('jeff')
+            logging.warning(f'[CONFIG LOADER] Could not load default config: {default_config_path}')
 
         pm_config.update(user_args)
         logging.debug(f'[CONFIG LOADER] PM Config: {json.dumps(pm_config, indent=4)}')
@@ -123,7 +123,7 @@ class DmicConfigLoader:
                     logging.warning(f'[CONFIG LOADER] Property "{prop}" missing in app config...')
                     return False
                 
-        except Exception as e:
+        except KeyError:
             return False
 
         return True

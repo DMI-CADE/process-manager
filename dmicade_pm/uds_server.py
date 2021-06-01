@@ -86,7 +86,7 @@ class UdsServer:
             try:
                 self._client_conn.shutdown(socket.SHUT_WR)
                 self._client_conn.close()
-            except socket.error as e:
+            except socket.error:
                 logging.debug('[UDS SERVER] Shutdown failed.')
                 pass
 
@@ -98,6 +98,8 @@ class UdsServer:
         Args:
           message: str
             The message to send to the client.
+          return_zero_on_windows: bool
+            If true message always returns 0 when run on windows.
 
         Returns:
           The amount of bytes sent to the client.

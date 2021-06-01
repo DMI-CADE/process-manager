@@ -2,7 +2,7 @@ import json
 import subprocess
 import logging
 
-from ._applications import DmicAppNotRunningException, DmicAppNotConfiguredException, dmic_app_process_factory
+from ._applications import DmicAppNotRunningException, dmic_app_process_factory
 
 
 class DmicApplicationHandler:
@@ -12,7 +12,7 @@ class DmicApplicationHandler:
     closing them and verifying the applications state.
 
     Attributes:
-      apps_config : dict
+      process_manager : DmicProcessManager
         Application configurations loaded from the config file.
       config_loader : DmicConfigLoader
         A config loader for retrieving app configs.
@@ -131,14 +131,6 @@ class DmicApplicationHandler:
         window_search_term = dmic_app_process_factory(app_id, self._config_loader.configs[app_id]).get_window_search_term()
         found_window = sp_check_output(self.CMD_SEARCH_WINDOW % window_search_term)
         return len(found_window) == 0
-
-    def _get_app_config(self, app_id):
-        """Gets the applications config."""
-
-        if app_id not in self.apps_config:
-            raise DmicAppNotConfiguredException(app_id)
-
-        return self.apps_config[app_id]
 
     def _get_window_id(self, app_id):
         """Gets the window id of an application."""

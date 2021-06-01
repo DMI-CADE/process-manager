@@ -10,7 +10,7 @@ class DmicMessageParser:
     """Message parser for dmic process manager.
 
     Parses messages from the UdsServer to tasks for the dmic
-    statemachine.
+    state machine.
     
     Attributes:
       received_task_event : DmicEvent

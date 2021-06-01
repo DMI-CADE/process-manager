@@ -52,22 +52,22 @@ class Client:
     def start(self):
         logging.debug('[PM CLIENT] Start')
 
-        #self._uds_server.connected_event += lambda x: print('[Client] udsServer: Connected!')
-        #self._uds_server.received_event += lambda msg: print('[Client] udsServer: Received: ', msg)
-        #self._uds_server.disconnected_event += lambda x: print('[Client] udsServer: Disconnected...')
+        # self._uds_server.connected_event += lambda x: print('[Client] udsServer: Connected!')
+        # self._uds_server.received_event += lambda msg: print('[Client] udsServer: Received: ', msg)
+        # self._uds_server.disconnected_event += lambda x: print('[Client] udsServer: Disconnected...')
 
         self._uds_server.start()
 
-        #while not self._uds_server.is_connected():
-            #pass
+        # while not self._uds_server.is_connected():
+            # pass
 
         # self._process_manager._timer.alert_event += lambda x: print('--------- jeff')
         # self._process_manager._timer.set_timer(3)
         # input('...\n')
         # self._process_manager._timer.reset()
-        #input('...\n')
-        #self._uds_server.close()
-        #return
+        # input('...\n')
+        # self._uds_server.close()
+        # return
 
         t = threading.Thread(target=self._debug, daemon=True)
         t.name = 'debug_thread'
