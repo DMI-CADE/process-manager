@@ -1,6 +1,8 @@
 from .tasks import DmicTask, DmicTaskType
 from .application_handler import DmicApplicationHandler
 from .timer import DmicTimer
+from .input_listener import KeyboardListener
+
 
 class DmicProcessManager:
     """Facade for controlling process manager components."""
@@ -11,6 +13,10 @@ class DmicProcessManager:
         self._app_handler = DmicApplicationHandler(self, config_loader)
         self._uds_server = uds_server
         self._timer = DmicTimer()
+        self._key_listener = KeyboardListener()
+
+        # self._key_listener.keyboard_triggered_event += self._timer.reset()
+        # self._key_listener.start()
 
     def send_to_ui(self, msg: str):
         self._uds_server.send(msg)

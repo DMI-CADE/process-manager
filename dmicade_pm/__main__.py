@@ -50,7 +50,7 @@ class Client:
         self._message_parser.received_task_event += self.queue_state_task
 
     def start(self):
-        print('[PM CLIENT] Start')
+        logging.debug('[PM CLIENT] Start')
 
         #self._uds_server.connected_event += lambda x: print('[Client] udsServer: Connected!')
         #self._uds_server.received_event += lambda msg: print('[Client] udsServer: Received: ', msg)
@@ -76,7 +76,9 @@ class Client:
         # self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.TEST, ':)'))
         self._state_machine.run_event_loop_sync()
 
+        logging.debug('[PM CLIENT] Close uds server...')
         self._uds_server.close()
+        logging.debug('[PM CLIENT] Done...')
 
     def queue_state_task(self, task: DmicTask):
         self._state_machine.queue_task_for_state(task)
