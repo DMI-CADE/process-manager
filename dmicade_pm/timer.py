@@ -12,11 +12,12 @@ class DmicTimer:
         self.alert_event = DmicEvent()
         self._current_timer_length = 0
 
-    def set_timer(self, seconds: int):
+    def set_timer(self, seconds: int, log=True):
         """Starts the timer with given seconds."""
 
-        self.stop()
-        logging.debug(f'[TIMER] Set timer to {seconds}s.')
+        self.stop(log)
+        if log:
+            logging.debug(f'[TIMER] Set timer to ({seconds})s.')
 
         self._current_timer_length = seconds
 
@@ -30,17 +31,18 @@ class DmicTimer:
         Triggers alert event.
         """
 
-        logging.info('[TIMER] Timer ran out!')
+        logging.info(f'[TIMER] Timer ran out! ({self._current_timer_length})s')
         self.alert_event.update()
 
     def reset(self):
         """Resets the timer to previously set seconds."""
 
-        logging.debug('[TIMER] Reset timer...')
-        self.set_timer(self._current_timer_length)
+        # logging.debug('[TIMER] Reset timer...')
+        self.set_timer(self._current_timer_length, False)
 
-    def stop(self):
+    def stop(self, log=True):
         """Stops the timer."""
 
-        logging.debug('[TIMER] Stop timer.')
+        if log:
+            logging.debug('[TIMER] Stop timer.')
         self.timer_thread.cancel()
