@@ -19,7 +19,7 @@ CONFIG_REQUIREMENTS = {
             "logo": "str"
         },
         "type": "str",
-        "command": "str" # %%path%% gets replaced with the dmic app location
+        "command": "str"  # %%path%% gets replaced with the dmic app location
     }
 }
 
@@ -63,7 +63,6 @@ class DmicConfigLoader:
         logging.debug(f'[CONFIG LOADER] PM Config: {json.dumps(pm_config, indent=4)}')
 
         return pm_config
-
 
     def _load_app_configs(self):
         """Loads all app configs into the configs member variable.

@@ -79,6 +79,7 @@ class C_CloseGame(DmicCommand):
         is_closed = self._pm.verify_closed(app_id)
         return is_closed
 
+
 class C_SendToUI(DmicCommand):
     def execute(self, data):
         logging.debug(f'[COMMAND: SendToUI] Execute: {data=}')

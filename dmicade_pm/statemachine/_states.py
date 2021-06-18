@@ -88,10 +88,11 @@ class S_InMenu(DmicState):
             self.cmd_start_game.execute(app_id)
 
         elif task.type is DmicTaskType.TIMEOUT:
-            pass # TODO
+            pass  # TODO
 
     def exit(self):
         logging.debug('[STATE: INMENU] Exit')
+
 
 class S_Idle(DmicState):
     def __init__(self, command_pool):
@@ -101,6 +102,7 @@ class S_Idle(DmicState):
     def handle(self, task):
         if task.type is DmicTaskType.INTERACTION:
             self.cmd_change_state.execute('inmenu')
+
 
 class S_InGame(DmicState):
     def __init__(self, command_pool):
@@ -122,4 +124,4 @@ class S_InGame(DmicState):
             self.cmd_change_state.execute('inmenu')
 
         elif task.type is DmicTaskType.TIMEOUT:
-            pass # TODO
+            pass  # TODO
