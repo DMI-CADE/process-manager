@@ -2,7 +2,7 @@ from pynput import keyboard
 from .helper import DmicEvent
 
 
-class KeyboardListener():
+class KeyboardListener:
     """Continuous keyboard listener.
 
     Updates an event every time any keyboard key is pressed.

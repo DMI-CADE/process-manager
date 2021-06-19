@@ -57,7 +57,7 @@ class C_StartGame(DmicCommand):
             is_running = self._pm.verify_running(app_id)
 
             if not is_running:
-                logging.debug('[COMMAND: StartGame] not initialy verified as running...')
+                logging.debug('[COMMAND: StartGame] not initially verified as running...')
                 time.sleep(1)
                 is_running = self._pm.verify_running(app_id)
 
@@ -91,6 +91,11 @@ class C_SendToUI(DmicCommand):
             send_success = False
 
         return send_success
+
+
+class C_SetInteractionFeedback(DmicCommand):
+    def execute(self, data):
+        self._pm.set_interaction_feedback(data)
 
 
 class C_SetTimer(DmicCommand):
