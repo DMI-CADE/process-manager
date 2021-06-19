@@ -9,7 +9,7 @@ class DmicProcessManager:
 
     def __init__(self, client, uds_server, config_loader):
         self._client = client
-        self._config_loader = config_loader
+        self.config_loader = config_loader
         self._app_handler = DmicApplicationHandler(self, config_loader)
         self._uds_server = uds_server
         self._timer = DmicTimer()
