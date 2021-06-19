@@ -15,8 +15,8 @@ class DmicProcessManager:
         self._timer = DmicTimer()
         self._key_listener = KeyboardListener()
 
-        # self._key_listener.keyboard_triggered_event += self._timer.reset()
-        # self._key_listener.start()
+        self._key_listener.keyboard_triggered_event += lambda x: self._timer.reset()
+        self._key_listener.start()
 
     def send_to_ui(self, msg: str):
         self._uds_server.send(msg)
