@@ -6,6 +6,16 @@ from ..tasks import DmicTask, DmicTaskType
 from ..commands import DmicCommandPool
 
 
+UI_MSG = {
+    'app_started': 'app_started:',
+    'game_not_found': 'game_not_found',
+    'app_closed': 'app_closed',
+    'activate_menu': 'activate',
+    'deactivate_menu': 'deactivate',
+    'boot_menu': 'boot'
+}
+
+
 class DmicState(ABC):
     """Abstract state class."""
 
@@ -63,9 +73,11 @@ class S_Start(DmicState):
     def __init__(self, command_pool):
         super().__init__(command_pool)
         self.cmd_change_state = command_pool.get_object('changestate')
+        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
 
     def enter(self):
         logging.debug('[STATE: START] Enter.')
+        self.cmd_send_to_ui.execute(UI_MSG['boot_menu'])
         self.cmd_change_state.execute('inmenu')
 
 
@@ -74,9 +86,12 @@ class S_InMenu(DmicState):
         super().__init__(command_pool)
         self.cmd_start_game = command_pool.get_object('startgame')
         self.cmd_change_state = command_pool.get_object('changestate')
+        self.cmd_set_timer_menu = command_pool.get_object('settimermenu')
+        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
 
     def enter(self):
         logging.debug('[STATE: INMENU] Enter.')
+        self.cmd_set_timer_menu.execute(None)
 
     def handle(self, task):
         logging.debug(f'[STATE: INMENU] Handle: {task=}')
@@ -85,7 +100,12 @@ class S_InMenu(DmicState):
             logging.debug('[STATE: INMENU] Start game!')
             app_id = task.data
             self.cmd_change_state.execute('ingame')
-            self.cmd_start_game.execute(app_id)
+
+            app_started = self.cmd_start_game.execute(app_id)
+            self.cmd_send_to_ui.execute(UI_MSG['app_started'] + f"{app_started}".lower())
+
+            if not app_started:
+                pass  # TODO
 
         elif task.type is DmicTaskType.TIMEOUT:
             pass  # TODO
@@ -109,6 +129,10 @@ class S_InGame(DmicState):
         super().__init__(command_pool)
         self.cmd_close_game = command_pool.get_object('closegame')
         self.cmd_change_state = command_pool.get_object('changestate')
+        self.cmd_set_timer_game = command_pool.get_object('settimergame')
+
+    def enter(self):
+        self.cmd_set_timer_game.execute(None)
 
     def handle(self, task):
         logging.debug(f'[STATE: INGAME] Handle: {task=}')
