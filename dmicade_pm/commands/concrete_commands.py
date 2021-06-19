@@ -86,3 +86,21 @@ class C_SendToUI(DmicCommand):
         bytes_sent = self._pm.send_to_ui(data)
 
         return bytes_sent > 0
+
+
+class C_SetTimer(DmicCommand):
+    def execute(self, data):
+        logging.debug(f'[COMMAND: SetTimer] Execute: {data=}')
+        self._pm.set_timer(data)
+
+
+class C_SetTimerGame(DmicCommand):
+    def execute(self, data):
+        logging.debug(f'[COMMAND: SetTimerGame] Execute.')
+        self._c_pool.invoke_command('settimer', int(self._pm.config_loader.global_config['game_timeout']))
+
+
+class C_SetTimerMenu(DmicCommand):
+    def execute(self, data):
+        logging.debug(f'[COMMAND: SetTimerMenu] Execute.')
+        self._c_pool.invoke_command('settimer', int(self._pm.config_loader.global_config['menu_timeout']))
