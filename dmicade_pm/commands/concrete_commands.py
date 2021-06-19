@@ -85,7 +85,12 @@ class C_SendToUI(DmicCommand):
         logging.debug(f'[COMMAND: SendToUI] Execute: {data=}')
         bytes_sent = self._pm.send_to_ui(data)
 
-        return bytes_sent > 0
+        if bytes_sent:
+            send_success = bytes_sent > 0
+        else:
+            send_success = False
+
+        return send_success
 
 
 class C_SetTimer(DmicCommand):
