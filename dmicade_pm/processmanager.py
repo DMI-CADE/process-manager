@@ -15,6 +15,8 @@ class DmicProcessManager:
         self._timer = DmicTimer()
         self._key_listener = KeyboardListener()
 
+        self._timer.alert_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.TIMEOUT, None))
+
         self._key_listener.keyboard_triggered_event += lambda x: self._timer.reset()
         self._key_listener.start()
 
