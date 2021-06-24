@@ -4,9 +4,10 @@ from enum import Enum, auto
 class DmicTaskType(Enum):
     TEST = auto()
     INTERACTION = auto()
-    CHANGE_STATE = auto()
+    CHANGE_STATE = auto()  # Handled by state machine.
     START_APP = auto()
     CLOSE_APP = auto()
+    SET_ACTIVE_APP = auto()  # Handled by state machine.
     APP_CRASHED = auto()
     TIMEOUT = auto()
 

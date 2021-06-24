@@ -142,5 +142,7 @@ def dmic_app_process_factory(app_id, app_config) -> DmicApp:
             raise DmicAppNotConfiguredException(app_config)
     except ValueError:
         raise DmicAppNotConfiguredException(app_config)
+    except KeyError:
+        raise DmicAppNotConfiguredException(app_config)
 
     return new_app_process

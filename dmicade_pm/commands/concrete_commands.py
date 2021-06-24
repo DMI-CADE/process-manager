@@ -69,6 +69,12 @@ class C_StartGame(DmicCommand):
         return is_running
 
 
+class C_SetActiveApp(DmicCommand):
+    def execute(self, data):
+        logging.debug(f'[COMMAND: SetActiveApp] Execute: {data=}')
+        self._pm.queue_state_task(DmicTask(DmicTaskType.SET_ACTIVE_APP, data))
+
+
 class C_CloseGame(DmicCommand):
     def execute(self, data):
         logging.debug(f'[COMMAND: CloseGame] Execute: {data=}')
@@ -114,3 +120,8 @@ class C_SetTimerMenu(DmicCommand):
     def execute(self, data):
         logging.debug(f'[COMMAND: SetTimerMenu] Execute.')
         self._c_pool.invoke_command('settimer', int(self._pm.config_loader.global_config['menu_timeout']))
+
+
+class C_StopTimer(DmicCommand):
+    def execute(self, data):
+        self._pm.stop_timer()

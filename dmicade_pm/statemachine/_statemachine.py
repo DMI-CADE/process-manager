@@ -17,6 +17,7 @@ class DmicStateMachine:
         self._current_state = self._state_pool.get_object('start')
         self._task_queue = []
         self._is_running = False
+        self._active_app = None
 
     def run_event_loop_sync(self):
         """Runs synchronous state machine loop.
@@ -66,10 +67,15 @@ class DmicStateMachine:
         current_task = self._task_queue[0]
         logging.info(f'[STATEM] Execute Task: {current_task.type.name}, {current_task.data}')
 
-        if current_task.type is DmicTaskType.CHANGE_STATE:
+        if current_task.type is DmicTaskType.SET_ACTIVE_APP:
+            self._active_app = current_task.data
+        elif current_task.type is DmicTaskType.CHANGE_STATE:
             self._change_state(current_task.data)
-
         else:
+            # Inject active apps name into task data while 'InGame'.
+            if self._current_state == self._state_pool.get_object('ingame') and not current_task.data:
+                current_task.data = self._active_app
+
             self._current_state.handle(current_task)
 
         self._task_queue.remove(current_task)
