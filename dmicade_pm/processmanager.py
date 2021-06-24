@@ -13,14 +13,17 @@ class DmicProcessManager:
         self._app_handler = DmicApplicationHandler(self, config_loader)
         self._uds_server = uds_server
         self._timer = DmicTimer()
-        self._key_listener = KeyboardListener()
+        self._key_listener = KeyboardListener(config_loader.global_config)
 
         self._interaction_feedback_active = False
 
         self._timer.alert_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.TIMEOUT, None))
 
+        # Reset timer when any button is pressed.
         self._key_listener.keyboard_triggered_event += lambda x: self._timer.reset()
         self._key_listener.keyboard_triggered_event += self._interaction_feedback_callback
+
+        self._key_listener.menu_button_triggered_event += self._menu_button_callback
         self._key_listener.start()
 
     def send_to_ui(self, msg: str):
@@ -50,6 +53,10 @@ class DmicProcessManager:
 
     def verify_closed(self, app_id):
         return self._app_handler.verify_closed(app_id)
+
+    def _menu_button_callback(self, data):
+        # Game id gets injected with the active apps name by the state machine.
+        self.queue_state_task(DmicTask(DmicTaskType.CLOSE_APP, None))
 
     def _interaction_feedback_callback(self, data):
         if self._interaction_feedback_active:

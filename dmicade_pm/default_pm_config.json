@@ -2,5 +2,6 @@
     "logs": "./logs",
     "apps_location": "~/dmic-apps/",
     "menu_timeout": "600",
-    "game_timeout": "300"
+    "game_timeout": "300",
+    "menu_button": "m"
 }
