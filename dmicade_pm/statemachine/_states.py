@@ -88,6 +88,7 @@ class S_InMenu(DmicState):
     def __init__(self, command_pool):
         super().__init__(command_pool)
         self.cmd_start_game = command_pool.get_object('startgame')
+        self.cmd_focus_app = command_pool.get_object('focusapp')
         self.cmd_change_state = command_pool.get_object('changestate')
         self.cmd_set_active_app = command_pool.get_object('setactiveapp')
         self.cmd_set_timer_menu = command_pool.get_object('settimermenu')
@@ -113,11 +114,17 @@ class S_InMenu(DmicState):
             if app_started:
                 self.cmd_change_state.execute('ingame')
                 self.cmd_set_active_app.execute(app_id)
-                time.sleep(0.1)  # TODO focus game
+                app_focused = self.cmd_focus_app.execute(app_id)
+                if not app_focused:
+                    logging.warning(f'[STATE: INMENU] Could not focus app: {app_id}')
+                    # TODO handle app not focused
+
+                time.sleep(0.05)
                 self.cmd_send_to_ui.execute(UI_MSG['deactivate_menu'])
 
             else:
-                pass  # TODO handle game not starting
+                logging.warning(f'[STATE: INMENU] Could start app: {app_id}')
+                # TODO handle game not starting
 
         elif task.type is DmicTaskType.TIMEOUT:
             self.cmd_change_state.execute('idle')

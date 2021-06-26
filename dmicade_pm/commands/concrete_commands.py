@@ -75,6 +75,26 @@ class C_SetActiveApp(DmicCommand):
         self._pm.queue_state_task(DmicTask(DmicTaskType.SET_ACTIVE_APP, data))
 
 
+class C_FocusApp(DmicCommand):
+    FOCUS_REPS = 3
+    FOCUS_REP_DELAY = 0.1
+
+    def execute(self, data):
+        logging.debug(f'[COMMAND: FocusApp] Execute: {data=}')
+        self._pm.focus_app(data)
+        app_is_focused = False
+
+        for rep in range(self.FOCUS_REPS):
+            app_is_focused = self._pm.verify_focus(data)
+            if app_is_focused:
+                break
+
+            logging.debug(f'[COMMAND: FocusApp] app {data} not focused. Try: {rep+1}')
+            time.sleep(self.FOCUS_REP_DELAY)
+
+        return app_is_focused
+
+
 class C_CloseGame(DmicCommand):
     def execute(self, data):
         logging.debug(f'[COMMAND: CloseGame] Execute: {data=}')
