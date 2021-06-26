@@ -33,16 +33,20 @@ class DmicException(Exception):
 
 
 class DmicEvent:
-    """TODO"""
+    """Simple subscribable event class for dmic events."""
 
     def __init__(self):
         self._subs = []
 
     def __iadd__(self, sub):
+        """Adds a callable to the list of subscribers."""
+
         self._subs.append(sub)
         return self
 
     def update(self, event_args=None):
+        """Calls all subscribers."""
+
         for sub in self._subs:
             sub(event_args)
 
