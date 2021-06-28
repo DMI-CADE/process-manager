@@ -1,5 +1,6 @@
 {
     "logs": "./logs",
+    "menu_process_name": "",
     "apps_location": "~/dmic-apps/",
     "menu_timeout": "600",
     "game_timeout": "300",

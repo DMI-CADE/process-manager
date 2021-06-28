@@ -33,7 +33,9 @@ def main():
     print(__import__('os').getcwd())
     parsed_args = parse_command_line_arguments(sys.argv)
     client = Client(parsed_args)
-    client.start()
+
+    debug_mode = 'debug' in parsed_args
+    client.start(debug_mode)
 
 
 class Client:
@@ -49,31 +51,20 @@ class Client:
 
         self._message_parser.received_task_event += self.queue_state_task
 
-    def start(self):
+    def start(self, debug_mode=False):
         logging.debug('[PM CLIENT] Start')
 
-        # self._uds_server.connected_event += lambda x: print('[Client] udsServer: Connected!')
-        # self._uds_server.received_event += lambda msg: print('[Client] udsServer: Received: ', msg)
-        # self._uds_server.disconnected_event += lambda x: print('[Client] udsServer: Disconnected...')
+        self._uds_server.connected_event += lambda x: logging.info('[PM CLIENT] UDS server connected!')
+        self._uds_server.disconnected_event += lambda x: logging.warning('[PM CLIENT] UDS server disconnected!')
 
         self._uds_server.start()
 
-        # while not self._uds_server.is_connected():
-            # pass
+        if debug_mode:
+            logging.info('[PM CLIENT] Running in Debug mode...')
+            t = threading.Thread(target=self._debug, daemon=True)
+            t.name = 'debug_thread'
+            t.start()
 
-        # self._process_manager._timer.alert_event += lambda x: print('--------- jeff')
-        # self._process_manager._timer.set_timer(3)
-        # input('...\n')
-        # self._process_manager._timer.reset()
-        # input('...\n')
-        # self._uds_server.close()
-        # return
-
-        t = threading.Thread(target=self._debug, daemon=True)
-        t.name = 'debug_thread'
-        # t.start()
-
-        # self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.TEST, ':)'))
         self._state_machine.run_event_loop_sync()
 
         logging.debug('[PM CLIENT] Close uds server...')
@@ -85,35 +76,11 @@ class Client:
 
     def _debug(self):
 
-        app_name = 'alien-soldier'
-        input('...\n')
-        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.START_APP, app_name))
-        input('...\n')
-        self._state_machine.queue_task_for_state(DmicTask(DmicTaskType.CLOSE_APP, app_name))
-        input('...\n')
-        self._state_machine.stop_event_loop()
+        input_str = ''
 
-        return
-
-        user_input = ''
-        states = ['start', 'test']
-        state = 0
-
-        def check_input(x):
-            return user_input[:len(x)] == x
-
-        while not check_input('exit'):
-            user_input = input()
-            if check_input('test'):
-                self.queue_state_task(DmicTask(DmicTaskType.TEST, user_input))
-            elif check_input('t3'):
-                self.queue_state_task(DmicTask(DmicTaskType.TEST, '1'))
-                self.queue_state_task(DmicTask(DmicTaskType.TEST, '2'))
-                self.queue_state_task(DmicTask(DmicTaskType.TEST, '3'))
-                self.queue_state_task(DmicTask(DmicTaskType.CHANGE_STATE, 'start'))
-            elif check_input('swst'):
-                state = (state + 1) % len(states)
-                self.queue_state_task(DmicTask(DmicTaskType.CHANGE_STATE, states[state]))
+        while input_str != 'exit':
+            input_str = input()
+            self._message_parser.parse_uds_message(input_str)
 
         self._state_machine.stop_event_loop()
 
