@@ -72,7 +72,7 @@ class UdsServer:
             warnings.warn('Uds socket functionalities are is disabled on Windows.')
 
         else:
-            self._connect_thread = threading.Thread(target=self._connect)
+            self._connect_thread = threading.Thread(target=self._connect, daemon=True)
             self._connect_thread.start()
 
     def close(self):
