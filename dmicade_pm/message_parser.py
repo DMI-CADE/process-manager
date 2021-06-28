@@ -37,6 +37,9 @@ class DmicMessageParser:
         logging.debug(f'[MSG PARSER] {message=}')
 
         msg_parts = re.match(r'(?P<msg_type>[^\:\s]+)\:?(?P<data>[^\:\s]*)', message)
+        if not msg_parts:
+            return
+
         msg_type = msg_parts.group('msg_type')
         msg_data = msg_parts.group('data')
 
