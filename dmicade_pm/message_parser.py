@@ -18,11 +18,10 @@ class DmicMessageParser:
         uds server.
     """
 
-    def __init__(self, uds_server:UdsServer):
+    def __init__(self, uds_server: UdsServer):
         self.received_task_event = DmicEvent()
 
         uds_server.received_event += self.parse_uds_message
-
 
     def parse_uds_message(self, message):
         """Parses msgs received from the uds server into dmic tasks.
