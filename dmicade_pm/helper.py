@@ -20,7 +20,7 @@ def parse_command_line_arguments(cl_args):
     user_args = dict()
 
     for arg in cl_args:
-        match = re.match(r'--(?P<arg>\S+)=(?P<value>[\"\']?\S+[\"\']?)', arg)
+        match = re.match(r'--(?P<arg>[^=\s]+)=?(?P<value>[\"\']?\S*[\"\']?)', arg)
         if match:
             user_args[match.group('arg')] = match.group('value')
 
