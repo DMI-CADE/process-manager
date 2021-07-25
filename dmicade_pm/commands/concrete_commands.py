@@ -118,6 +118,9 @@ class C_SendToUI(DmicCommand):
 
         return send_success
 
+class C_VerifyAppIsConfigured(DmicCommand):
+    def execute(self, data):
+        return data in self._pm.config_loader.configs
 
 class C_SetInteractionFeedback(DmicCommand):
     def execute(self, data):

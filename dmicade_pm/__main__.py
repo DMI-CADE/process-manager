@@ -5,7 +5,7 @@ import logging
 from .helper import parse_command_line_arguments
 from .processmanager import DmicProcessManager
 from .statemachine import DmicStateMachine
-from .tasks import DmicTaskType, DmicTask
+from .tasks import DmicTask
 from .commands import DmicCommandPool
 from .uds_server import UdsServer
 from .message_parser import DmicMessageParser

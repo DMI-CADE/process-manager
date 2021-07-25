@@ -9,8 +9,9 @@ from ..commands import DmicCommandPool
 
 UI_MSG = {
     'app_started': 'app_started:',
-    'game_not_found': 'game_not_found',
+    'app_not_found': 'app_not_found',
     'app_closed': 'app_closed',
+    'app_crashed': 'app_crashed',
     'activate_menu': 'activate',
     'deactivate_menu': 'deactivate',
     'enter_idle': 'idle_enter',
@@ -93,6 +94,7 @@ class S_InMenu(DmicState):
         self.cmd_set_active_app = command_pool.get_object('setactiveapp')
         self.cmd_set_timer_menu = command_pool.get_object('settimermenu')
         self.cmd_send_to_ui = command_pool.get_object('sendtoui')
+        self.cmd_verify_app = command_pool.get_object('verifyappisconfigured')
 
     def enter(self):
         logging.debug('[STATE: INMENU] Enter.')
@@ -107,7 +109,13 @@ class S_InMenu(DmicState):
             logging.debug('[STATE: INMENU] Start game!')
             app_id = task.data
 
-            # TODO check app id
+            # Verify app is configured
+            if not self.cmd_verify_app.execute(app_id):
+                logging.warning(f'[STATE: INMENU] Could not start app "{app_id}": not configured...')
+                self.cmd_send_to_ui.execute(UI_MSG['app_not_found'])
+                return
+
+            # Start app
             app_started = self.cmd_start_game.execute(app_id)
             self.cmd_send_to_ui.execute(UI_MSG['app_started'] + str(app_started).lower())
 
@@ -119,11 +127,11 @@ class S_InMenu(DmicState):
                     logging.warning(f'[STATE: INMENU] Could not focus app: {app_id}')
                     # TODO handle app not focused
 
-                time.sleep(0.05)
+                time.sleep(0.05) # sleep to avoid funky msgs merges :/
                 self.cmd_send_to_ui.execute(UI_MSG['deactivate_menu'])
 
             else:
-                logging.warning(f'[STATE: INMENU] Could start app: {app_id}')
+                logging.warning(f'[STATE: INMENU] Could not start app: {app_id}')
                 # TODO handle game not starting
 
         elif task.type is DmicTaskType.TIMEOUT:
@@ -162,6 +170,7 @@ class S_InGame(DmicState):
         self.cmd_change_state = command_pool.get_object('changestate')
         self.cmd_set_timer_game = command_pool.get_object('settimergame')
         self.cmd_set_active_app = command_pool.get_object('setactiveapp')
+        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
 
     def enter(self):
         self.cmd_set_timer_game.execute(None)
@@ -170,15 +179,17 @@ class S_InGame(DmicState):
         logging.debug(f'[STATE: INGAME] Handle: {task=}')
         if task.type is DmicTaskType.CLOSE_APP or \
                 task.type is DmicTaskType.TIMEOUT:
-            app_id = task.data
-            self.cmd_close_game.execute(app_id)
-            self.cmd_change_state.execute('inmenu')
+            self._go_to_menu(task, 'app_closed')
 
         elif task.type is DmicTaskType.APP_CRASHED:
             logging.warning(f'[STATE: INGAME] Game crashed {task.data=}\n')
-            app_id = task.data
-            self.cmd_close_game.execute(app_id)
-            self.cmd_change_state.execute('inmenu')
+            self._go_to_menu(task, 'app_crashed')
+
+    def _go_to_menu(self, task, msg_id):
+        app_id = task.data
+        self.cmd_close_game.execute(app_id)
+        self.cmd_send_to_ui.execute(UI_MSG[msg_id])
+        self.cmd_change_state.execute('inmenu')
 
     def exit(self):
         self.cmd_set_active_app.execute(None)

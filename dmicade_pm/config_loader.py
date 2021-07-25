@@ -7,17 +7,11 @@ DEFAULT_CONFIG_FILE_NAME = 'default_pm_config.json'
 
 CONFIG_REQUIREMENTS = {
     "executable": {
-        "media": {
-            "logo": "str"
-        },
         "type": "str",
         "exe": "str"
     },
 
     "mame_rom": {
-        "media": {
-            "logo": "str"
-        },
         "type": "str",
         "command": "str"  # %%path%% gets replaced with the dmic app location
     }
@@ -109,9 +103,9 @@ class DmicConfigLoader:
             req_props = [] # required properties
 
             if config['type'] == 'executable':
-                req_props = ['type', 'media', 'exe']
+                req_props = ['type', 'exe']
             elif config['type'] == 'mame_rom':
-                req_props = ['type', 'media', 'command']
+                req_props = ['type','command']
             else:
                 config_type = config['type']
                 logging.warning(f'[CONFIG LOADER] Unknown application type "{config_type}"...')
