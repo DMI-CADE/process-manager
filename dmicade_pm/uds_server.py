@@ -5,6 +5,7 @@ import threading
 import warnings
 import logging
 
+from time import sleep
 from .helper import DmicEvent
 
 
@@ -114,6 +115,8 @@ class UdsServer:
 
         elif self.is_connected():
             bytes_sent = self._client_conn.send(message.encode('ascii'))
+
+        sleep(0.05) # Simple fix to avoid messages getting munched together when send in quick succession...
 
         return bytes_sent
 

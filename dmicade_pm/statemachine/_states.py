@@ -1,5 +1,4 @@
 import logging
-import time
 
 from abc import ABC
 from ..helper import ObjectPool
@@ -127,7 +126,6 @@ class S_InMenu(DmicState):
                     logging.warning(f'[STATE: INMENU] Could not focus app: {app_id}')
                     # TODO handle app not focused
 
-                time.sleep(0.05) # sleep to avoid funky msgs merges :/
                 self.cmd_send_to_ui.execute(UI_MSG['deactivate_menu'])
 
             else:
