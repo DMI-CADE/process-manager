@@ -22,7 +22,7 @@ class DmicConfigLoader:
 
     def __init__(self, cl_args):
         self.global_config = self._load_global_config(cl_args)
-        self.apps_path = self.global_config['apps_location']
+        self.apps_path = os.path.expanduser(self.global_config['apps_location'])
         self.configs = self._load_app_configs()
         logging.debug(f'[CONFIG LOADER] Configured apps: {self.configs.keys()}')
 
@@ -67,7 +67,7 @@ class DmicConfigLoader:
         configs = dict()
 
         # Load directories
-        apps_dir = os.listdir(os.path.expanduser(self.apps_path))
+        apps_dir = os.listdir(self.apps_path)
         logging.debug(f'[CONFIG LOADER] {apps_dir=}')
         
         for app in apps_dir:
