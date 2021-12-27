@@ -36,7 +36,6 @@ class DmicStateMachine:
                 task_is_ready = self._ready_task_buffer()
 
                 if task_is_ready:
-                    logging.debug('[STATEM] Execute Task...')
                     self._execute_next_task()
                     logging.debug('[STATEM] Task Done!')
 
@@ -65,6 +64,9 @@ class DmicStateMachine:
         """Handles execution of the next queued task."""
 
         current_task = self._task_queue[0]
+
+        if logging.root.level <= logging.INFO:
+            print()
         logging.info(f'[STATEM] Execute Task: {current_task.type.name}, {current_task.data}')
 
         if current_task.type is DmicTaskType.SET_ACTIVE_APP:

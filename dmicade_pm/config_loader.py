@@ -24,7 +24,7 @@ class DmicConfigLoader:
         self.global_config = self._load_global_config(cl_args)
         self.apps_path = os.path.expanduser(self.global_config['apps_location'])
         self.configs = self._load_app_configs()
-        logging.debug(f'[CONFIG LOADER] Configured apps: {self.configs.keys()}')
+        logging.info(f'[CONFIG LOADER] Registered apps: {list(self.configs.keys())}')
 
     def _load_global_config(self, user_args: dict):
         """Loads the global process manager config.
