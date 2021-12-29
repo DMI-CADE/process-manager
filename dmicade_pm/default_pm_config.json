@@ -4,5 +4,8 @@
     "apps_location": "/home/dmicade/dmic-apps/",
     "menu_timeout": "600",
     "game_timeout": "300",
-    "menu_button": "m"
+    "menu_button": "m",
+
+    "sleep_time": "22:00",
+    "wake_time": "08:00"
 }

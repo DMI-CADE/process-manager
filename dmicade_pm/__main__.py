@@ -62,7 +62,7 @@ class Client:
         if debug_mode:
             logging.info('[PM CLIENT] Running in Debug mode...')
             t = threading.Thread(target=self._debug, daemon=True)
-            t.name = 'debug_thread'
+            t.name = 'DebugThread'
             t.start()
 
         self._state_machine.run_event_loop_sync()
