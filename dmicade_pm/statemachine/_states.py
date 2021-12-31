@@ -155,10 +155,14 @@ class S_Idle(DmicState):
     def handle(self, task):
         if task.type is DmicTaskType.INTERACTION:
             self.cmd_change_state.execute('inmenu')
+            self.cmd_set_interaction_feedback.execute(False)
+            self.cmd_send_to_ui.execute(UI_MSG['exit_idle'])
+
+        if task.type is DmicTaskType.SLEEP:
+            self.cmd_change_state.execute('sleep')
 
     def exit(self):
         self.cmd_set_interaction_feedback.execute(False)
-        self.cmd_send_to_ui.execute(UI_MSG['exit_idle'])
 
 
 class S_InGame(DmicState):
@@ -191,3 +195,21 @@ class S_InGame(DmicState):
 
     def exit(self):
         self.cmd_set_active_app.execute(None)
+
+class S_Sleep(DmicState):
+    def __init__(self, command_pool):
+        super().__init__(command_pool)
+        self.cmd_change_state = command_pool.get_object('changestate')
+        self.cmd_enter_sleep = command_pool.get_object('entersleep')
+        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
+
+    def enter(self):
+        self.cmd_enter_sleep.execute(None)
+
+    def handle(self, task):
+        logging.debug(f'[STATE: SLEEP] Handle: {task=}')
+        if task.type is DmicTaskType.WAKE:
+            self.cmd_change_state.execute('inmenu')
+
+    def exit(self):
+        self.cmd_send_to_ui.execute(UI_MSG['exit_idle'])

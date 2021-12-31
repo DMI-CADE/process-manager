@@ -37,7 +37,7 @@ class DmicStateMachine:
 
                 if task_is_ready:
                     self._execute_next_task()
-                    logging.debug('[STATEM] Task Done!')
+                    logging.debug('[STATEM] Task Done!\n')
 
     def stop_event_loop(self):
         """Stops event loop.

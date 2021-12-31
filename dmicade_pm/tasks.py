@@ -10,6 +10,8 @@ class DmicTaskType(Enum):
     SET_ACTIVE_APP = auto()  # Handled by state machine.
     APP_CRASHED = auto()
     TIMEOUT = auto()
+    SLEEP = auto()
+    WAKE = auto()
 
 
 class DmicTask:

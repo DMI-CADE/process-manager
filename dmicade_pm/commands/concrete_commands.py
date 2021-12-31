@@ -148,3 +148,8 @@ class C_SetTimerMenu(DmicCommand):
 class C_StopTimer(DmicCommand):
     def execute(self, data):
         self._pm.stop_timer()
+
+
+class C_EnterSleep(DmicCommand):
+    def execute(self, data):
+        self._pm.enter_sleep()

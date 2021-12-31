@@ -20,6 +20,9 @@ class DmicProcessManager:
 
         self._timer.alert_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.TIMEOUT, None))
 
+        self._sleep_manager.notify_sleep_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.SLEEP, None))
+        self._sleep_manager.woke_up_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.WAKE, None))
+
         # Reset timer when any button is pressed.
         self._key_listener.keyboard_triggered_event += lambda x: self._timer.reset()
         self._key_listener.keyboard_triggered_event += self._interaction_feedback_callback
@@ -71,3 +74,6 @@ class DmicProcessManager:
 
     def stop_timer(self):
         self._timer.stop()
+
+    def enter_sleep(self):
+        self._sleep_manager.sleep_now()
