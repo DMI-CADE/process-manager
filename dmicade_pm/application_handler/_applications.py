@@ -39,7 +39,7 @@ class DmicApp(ABC):
         self._crash_check_thread = threading.Thread(
             target=self._wait_for_crash,
             daemon=True)
-        self._crash_check_thread.name = f'{self.app_id}-CrashCheckThread'
+        self._crash_check_thread.name = self.app_id.title().replace('-', '').replace('_', '') + 'CrashCheckThread'
         self._crash_check_thread.start()
 
         self._should_be_running = True
