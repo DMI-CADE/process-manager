@@ -1,4 +1,5 @@
 import logging
+import time
 
 from ._states import DmicStatePool
 from ..tasks import DmicTask, DmicTaskType
@@ -11,6 +12,8 @@ class DmicStateMachine:
     loop handles task execution generally by delegating it to the
     active state.
     """
+
+    TASK_CHECK_DELAY = 0.05
 
     def __init__(self, command_pool):
         self._state_pool = DmicStatePool(command_pool)
@@ -38,6 +41,9 @@ class DmicStateMachine:
                 if task_is_ready:
                     self._execute_next_task()
                     logging.debug('[STATEM] Task Done!\n')
+
+            else:
+                time.sleep(self.TASK_CHECK_DELAY)
 
     def stop_event_loop(self):
         """Stops event loop.
