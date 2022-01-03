@@ -20,11 +20,32 @@ class VolumeController():
         self._change_volume_thread.name = 'VolumeControllerThread'
         self._change_volume_thread.start()
 
+    def set_volume(self, volume_perc):
+        """Sets system volume to given percentage."""
+
+        logging.info(f'[VOLUME CONTROL] Set volume to {volume_perc}%.')
+
+        self._audio_level = volume_perc
+        self._audio_level_goal = volume_perc
+
+        set_volume_cmd = self.CMD_SET_VOLUME % self._audio_level + '%'
+        subprocess.run(set_volume_cmd, shell=True, stdout=subprocess.PIPE)
+
     def fade_volume(self, goal_perc, max_fade_duration):
         """Sets values accordingly to move the volume to 'goal_perc'% in max_fade_duration seconds."""
 
+        if goal_perc == self._audio_level_goal or goal_perc == self._audio_level:
+            logging.debug(
+                f'[VOLUME CONTROL] Tried Volume fade to {self._audio_level_goal}% in {max_fade_duration}s ' +
+                f'but volume is already at {self._audio_level}%')
+            return
+
         self._audio_level_goal = goal_perc
         audio_level_steps = abs(goal_perc - self._audio_level)
+        if audio_level_steps == 0:
+            logging.warning(f'[VOLUME CONTROL] Something went wrong... {self._audio_level=} {self._audio_level_goal=} {audio_level_steps=}')
+            return
+
         self._fade_time_delta = max_fade_duration / audio_level_steps
         logging.info(f'[VOLUME CONTROL] Start Volume fade from {self._audio_level}% to {self._audio_level_goal}% in {max_fade_duration}s')
         logging.debug(f'[VOLUME CONTROL] {self._fade_time_delta=}')
@@ -32,19 +53,19 @@ class VolumeController():
     def _change_volume(self):
         """Waits for new audio level goal to be set. Then starts fading towards that level.
         
-        Uses values set in class object.
+        Uses values set in class instance.
         Fades in increments of 1%.
         """
 
         while True:
             if self._audio_level != self._audio_level_goal:
 
-                # Move level thowards the goal.
+                # Move volume level towards the goal.
                 self._audio_level += math.copysign(1, self._audio_level_goal - self._audio_level)
                 # logging.debug(f'[VOLUME CONTROL] {self._audio_level=}')
 
                 set_volume_cmd = self.CMD_SET_VOLUME % self._audio_level + '%'
-                subprocess.run(set_volume_cmd, shell=True, stdout=subprocess.PIPE)
+                subprocess.Popen(set_volume_cmd, shell=True, stdout=subprocess.PIPE)
                 
                 time.sleep(self._fade_time_delta)
 
