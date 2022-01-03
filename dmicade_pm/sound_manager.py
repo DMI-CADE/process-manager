@@ -36,10 +36,6 @@ class VolumeController():
         Fades in increments of 1%.
         """
 
-        time.sleep(2)
-        print('jeff')
-        self.fade_volume(100, 20)
-
         while True:
             if self._audio_level != self._audio_level_goal:
 
