@@ -118,10 +118,8 @@ class SleepManager():
             t = time.localtime()
             now_s = t.tm_hour * 3600 + t.tm_min * 60 + t.tm_sec
             if self._is_sleep_time(self.sleep_time, self.wake_time, now_s):
-                logging.info('[SLEEP MANAGER] It is sleeping time...')
                 self._update_sleeping_time_state(True)
             else:
-                logging.info('[SLEEP MANAGER] Wake up time!')
                 self._update_sleeping_time_state(False)
 
             if self._is_sleeping_time:
@@ -140,10 +138,14 @@ class SleepManager():
         return (now+td)%day_s < (wake+td)%day_s
 
     def _update_sleeping_time_state(self, is_sleeping):
+
+        # Trigger sleep state change events.
         if is_sleeping != self._is_sleeping_time:
             if is_sleeping:
+                logging.info('[SLEEP MANAGER] It is sleeping time...')
                 self.entered_sleeptime_event.update()
             else:
+                logging.info('[SLEEP MANAGER] Wake up time!')
                 self.exit_sleeptime_event.update()
 
         self._is_sleeping_time = is_sleeping
