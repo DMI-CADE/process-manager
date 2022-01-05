@@ -12,19 +12,19 @@ class DmicProcessManager:
         self.config_loader = config_loader
         self._app_handler = DmicApplicationHandler(self, config_loader)
         self._uds_server = uds_server
-        self._timer = DmicTimer()
+        self._timeout_timer = DmicTimer()
         self._sleep_manager = SleepManager(config_loader.global_config)
         self._key_listener = KeyboardListener(config_loader.global_config)
 
         self._interaction_feedback_active = False
 
-        self._timer.alert_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.TIMEOUT, None))
+        self._timeout_timer.alert_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.TIMEOUT, None))
 
         self._sleep_manager.notify_sleep_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.SLEEP, None))
         self._sleep_manager.woke_up_event += lambda x: self.queue_state_task(DmicTask(DmicTaskType.WAKE, None))
 
         # Reset timer when any button is pressed.
-        self._key_listener.keyboard_triggered_event += lambda x: self._timer.reset()
+        self._key_listener.keyboard_triggered_event += lambda x: self._timeout_timer.reset()
         self._key_listener.keyboard_triggered_event += self._interaction_feedback_callback
 
         self._key_listener.menu_button_triggered_event += self._menu_button_callback
@@ -70,10 +70,10 @@ class DmicProcessManager:
         self._interaction_feedback_active = is_on
 
     def set_timer(self, seconds):
-        self._timer.set_timer(seconds)
+        self._timeout_timer.set_timer(seconds)
 
     def stop_timer(self):
-        self._timer.stop()
+        self._timeout_timer.stop()
 
     def enter_sleep(self):
         self._sleep_manager.sleep_now()
