@@ -11,32 +11,55 @@ from .helper import DmicEvent
 class DmicTimer:
     """Timer class for handling timeouts."""
 
+    TIMER_ACCURACY = 0.1
+
     def __init__(self):
-        self.timer_thread = threading.Timer(0, None)
         self.alert_event = DmicEvent()
         self._current_timer_length = 0
+        self._elapsed_time = 0
+
+        self._is_running = threading.Event()
+        self._is_running.clear()
+        self._restart_timer = False
+
+        self._timer_thread = threading.Thread(target=self._timer, daemon=True)
+        self._timer_thread.name = 'DmicTimerThread'
+        self._timer_thread.start()
 
     def set_timer(self, seconds: int, log=True):
-        """Starts the timer with given seconds."""
+        """Starts and sets the timer to given seconds."""
 
-        self.stop(log)
+        self._restart_timer = True
+        self._current_timer_length = seconds
         if log:
             logging.debug(f'[TIMER] Set timer to ({seconds})s.')
+        self._is_running.set()
 
-        self._current_timer_length = seconds
+    def _timer(self):
+        """Timer thread."""
 
-        self.timer_thread = threading.Timer(seconds, self._timer_callback)
-        self.timer_thread.name = 'dmic_timer_thread'
-        self.timer_thread.start()
+        while True:
+            # logging.debug('[TIMER] waiting...')
+            self._is_running.wait()
 
-    def _timer_callback(self):
-        """Callback function for when the timer runs out.
+            self._restart_timer = False
+            self._elapsed_time = 0
+            start_time = time.time()
 
-        Triggers alert event.
-        """
+            while self._elapsed_time <= self._current_timer_length and self._is_running.is_set():
+                if self._restart_timer:
+                    self._restart_timer = False
+                    break
 
-        logging.info(f'[TIMER] Timer ran out! ({self._current_timer_length})s')
-        self.alert_event.update()
+                self._elapsed_time = time.time() - start_time
+                # print(f'{self._elapsed_time=}')
+
+                if self._elapsed_time > self._current_timer_length and not self._restart_timer:
+                    self._is_running.clear()
+                    logging.info(f'[TIMER] Timer ran out! ({self._current_timer_length})s')
+                    self.alert_event.update()
+                else:
+                    time.sleep(self.TIMER_ACCURACY)
 
     def reset(self):
         """Resets the timer to previously set seconds."""
@@ -44,12 +67,11 @@ class DmicTimer:
         # logging.debug('[TIMER] Reset timer...')
         self.set_timer(self._current_timer_length, False)
 
-    def stop(self, log=True):
+    def stop(self):
         """Stops the timer."""
 
-        if log:
-            logging.debug('[TIMER] Stop timer.')
-        self.timer_thread.cancel()
+        logging.debug('[TIMER] Stop timer.')
+        self._is_running.clear()
 
 
 class SleepManager():
@@ -100,8 +122,6 @@ class SleepManager():
 
         self.sleep_time = int(st.group('hour'))%24 * 3600 + int(st.group('min')) * 60
         self.wake_time = int(wt.group('hour'))%24 * 3600 + int(wt.group('min')) * 60
-        self._st_values = ( int(st.group('hour'))%24, int(st.group('min')) )
-        self._wt_values = ( int(wt.group('hour'))%24, int(wt.group('min')) )
         logging.info(f'[SLEEP MANAGER] sleep_time: {config["sleep_time"]} (={self.sleep_time}s), wake_time: {config["wake_time"]} (={self.wake_time}s)')
 
         # Start time checking.
