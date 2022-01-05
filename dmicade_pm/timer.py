@@ -1,6 +1,7 @@
 import logging
 import threading
 import time
+import datetime
 import re
 import subprocess
 
@@ -55,6 +56,7 @@ class SleepManager():
     """TODO"""
 
     TIME_REGEX = r'^(?P<hour>(\d{1}|[01]\d|[2][0-4]))\:(?P<min>[0-6]\d)'
+    CMD_SLEEP = 'rtcwake -m mem --date "%s"'
 
     def __init__(self, config):
         self.entered_sleeptime_event = DmicEvent()
@@ -74,20 +76,38 @@ class SleepManager():
             logging.warning('[SLEEP MANAGER] sleep_time and/or wake_time not set!')
             return
 
+        faulty_time_value = False
+        try:
+            self._st = datetime.datetime.strptime(config['sleep_time'], '%H:%M')
+        except ValueError as ve:
+            logging.warning(f'[SLEEP MANAGER] sleep_{ve}')
+            faulty_time_value = True
+
+        try:
+            self._wt = datetime.datetime.strptime(config['wake_time'], '%H:%M')
+        except ValueError as ve:
+            logging.warning(f'[SLEEP MANAGER] wake_{ve}')
+            faulty_time_value = True
+
+        if faulty_time_value:
+            return
+
         st = re.match(self.TIME_REGEX, config['sleep_time'])
         wt = re.match(self.TIME_REGEX, config['wake_time'])
         if not (st and wt):
-            logging.warning('[SLEEP MANAGER] sleep_time and/or wake_time not set correctly!')
+            logging.warning('[SLEEP MANAGER] sleep_time and/or wake_time not matching "hh:mm"!')
             return
 
         self.sleep_time = int(st.group('hour'))%24 * 3600 + int(st.group('min')) * 60
         self.wake_time = int(wt.group('hour'))%24 * 3600 + int(wt.group('min')) * 60
+        self._st_values = ( int(st.group('hour'))%24, int(st.group('min')) )
+        self._wt_values = ( int(wt.group('hour'))%24, int(wt.group('min')) )
         logging.info(f'[SLEEP MANAGER] sleep_time: {config["sleep_time"]} (={self.sleep_time}s), wake_time: {config["wake_time"]} (={self.wake_time}s)')
 
         # Start time checking.
         self._time_check_thread = threading.Thread(target=self._time_checking, daemon=True)
         self._time_check_thread.name = 'TimeCheckThread'
-        self._time_check_thread.start()
+        self._time_check_thread.start() # TODO make start after full client init
 
     def sleep_now(self):
         logging.info('[SLEEP MANAGER] Start sleep mode!')
@@ -102,9 +122,18 @@ class SleepManager():
     def _sleep(self):
         logging.debug('[SLEEP MANAGER] Run rtcwake...')
         # TODO set time correctly
-        sp = subprocess.Popen('rtcwake -m mem -s 60', stdout=subprocess.PIPE, shell=True)
+
+        wake_datetime = datetime.datetime.now().replace(hour=self._wt.hour, minute=self._wt.minute, second=0)
+        wake_is_today = wake_datetime > datetime.datetime.now()
+        if not wake_is_today:
+            wake_datetime += datetime.timedelta(days=1)
+
+        wake_datetime_str = wake_datetime.strftime('%Y-%m-%d %H:%M')
+        sleep_cmd = self.CMD_SLEEP % wake_datetime_str
+        logging.debug(f'[SLEEP MANAGER] Run sleep cmd: {sleep_cmd}')
+        sp = subprocess.Popen(sleep_cmd, stdout=subprocess.PIPE, shell=True)
         sp.wait()
-        logging.debug('[SLEEP MANAGER] Woke up!')
+        logging.info('[SLEEP MANAGER] Woke up!')
         self.woke_up_event.update()
 
     def _time_checking(self):
@@ -113,7 +142,9 @@ class SleepManager():
         logging.debug('[SLEEP MANAGER] Start time checking...')
 
         while True:
-            logging.debug('[SLEEP MANAGER] check time...')
+            time.sleep(self.notification_interval)
+
+            logging.debug('[SLEEP MANAGER] Check time...')
 
             t = time.localtime()
             now_s = t.tm_hour * 3600 + t.tm_min * 60 + t.tm_sec
@@ -124,8 +155,6 @@ class SleepManager():
 
             if self._is_sleeping_time:
                 self.notify_sleep_event.update()
-
-            time.sleep(self.notification_interval)
 
     def _is_sleep_time(self, sleep, wake, now, day_s=86400):
         """Checks if given time (now) is between sleep to wake time.
