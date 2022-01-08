@@ -34,10 +34,11 @@ class VolumeController():
     def fade_volume(self, goal_perc, max_fade_duration):
         """Sets values accordingly to move the volume to 'goal_perc'% in max_fade_duration seconds."""
 
-        if goal_perc == self._audio_level_goal or goal_perc == self._audio_level:
-            logging.debug(
-                f'[VOLUME CONTROL] Tried Volume fade to {self._audio_level_goal}% in {max_fade_duration}s ' +
-                f'but volume is already at {self._audio_level}%')
+        if goal_perc == self._audio_level_goal:
+            #print(f'{goal_perc} {self._audio_level_goal} {self._audio_level}')
+            #logging.debug(
+                #f'[VOLUME CONTROL] Tried Volume fade to {goal_perc}% in {max_fade_duration}s ' +
+                #f'but volume goal is already at {self._audio_level}%')
             return
 
         self._audio_level_goal = goal_perc

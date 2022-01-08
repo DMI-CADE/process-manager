@@ -129,6 +129,9 @@ class SleepManager():
         self._time_check_thread.name = 'TimeCheckThread'
         self._time_check_thread.start() # TODO make start after full client init
 
+    def is_sleep_time(self) -> bool:
+        return self._is_sleeping_time
+
     def sleep_now(self):
         logging.info('[SLEEP MANAGER] Start sleep mode!')
 
@@ -168,7 +171,7 @@ class SleepManager():
 
             t = time.localtime()
             now_s = t.tm_hour * 3600 + t.tm_min * 60 + t.tm_sec
-            if self._is_sleep_time(self.sleep_time, self.wake_time, now_s):
+            if self._check_sleep_time(self.sleep_time, self.wake_time, now_s):
                 self._update_sleeping_time_state(True)
             else:
                 self._update_sleeping_time_state(False)
@@ -176,7 +179,7 @@ class SleepManager():
             if self._is_sleeping_time:
                 self.notify_sleep_event.update()
 
-    def _is_sleep_time(self, sleep, wake, now, day_s=86400):
+    def _check_sleep_time(self, sleep, wake, now, day_s=86400):
         """Checks if given time (now) is between sleep to wake time.
 
         Values/Timestamps expected to be seconds since midnight.
