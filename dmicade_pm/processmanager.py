@@ -99,12 +99,18 @@ class DmicProcessManager:
     # Following functions violate the state model... But it had to be done...
 
     def _adjust_volume_on_interaction(self, data):
+
+        # Add up fade duration to start counter when high volume reched.
         if self.is_sleep_time():
             self._dyn_volume_timer.set_timer(
-                int(self.config_loader.global_config['volume_time_until_lowering_in_sleephours']), False)
+                int(self.config_loader.global_config['volume_up_fade_duration']) +
+                int(self.config_loader.global_config['volume_time_until_lowering_in_sleephours']),
+                False)
         else:
             self._dyn_volume_timer.set_timer(
-                int(self.config_loader.global_config['volume_time_until_lowering']), False)
+                int(self.config_loader.global_config['volume_up_fade_duration']) +
+                int(self.config_loader.global_config['volume_time_until_lowering']),
+                False)
 
         self.fade_volume(
             int(self.config_loader.global_config['volume_perc_high']),
