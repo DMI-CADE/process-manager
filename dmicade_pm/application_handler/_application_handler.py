@@ -76,9 +76,10 @@ class DmicApplicationHandler:
             logging.debug(f'[APP HANDLER] Verify running: {app_process_is_running=}')
             try:
                 window_found = self._get_window_id(app_id) > 0
-                logging.debug(f'[APP HANDLER] Verify running: {window_found=}')
             except DmicAppNotRunningException:
                 window_found = False
+
+        logging.debug(f'[APP HANDLER] Verify running: {window_found=}')
 
         app_is_running = app_exists and app_process_is_running and window_found
         return app_is_running
@@ -128,7 +129,9 @@ class DmicApplicationHandler:
         """Checks if an application is closed."""
 
         window_search_term = dmic_app_process_factory(app_id, self._config_loader.configs[app_id]).get_window_search_term()
+        logging.debug(f'[APP HANDLER] Verify closed: {window_search_term=}')
         found_window = sp_check_output(self.CMD_SEARCH_WINDOW % window_search_term)
+        logging.debug(f'[APP HANDLER] Verify closed: {found_window=} length: {len(found_window)}')
         return len(found_window) == 0
 
     def _get_window_id(self, app_id):
@@ -136,11 +139,15 @@ class DmicApplicationHandler:
 
         try:
             window_term = self.running_apps[app_id].get_window_search_term()
+            logging.debug(f'[APP HANDLER] Get Window Id: {window_term=}')
             window_id = sp_check_output(self.CMD_SEARCH_WINDOW % window_term)
+            logging.debug(f'[APP HANDLER] Get Window Id: {window_id=} {type(window_id)}')
             window_id = int(window_id)
-        except ValueError:
+        except ValueError as e:
+            logging.debug(f'[APP HANDLER] Get Window Id ValueError: {e}')
             raise DmicAppNotRunningException(app_id)
-        except KeyError:
+        except KeyError as e:
+            logging.debug(f'[APP HANDLER] Get Window Id KeyError: {e}')
             raise DmicAppNotRunningException(app_id)
 
         return window_id
