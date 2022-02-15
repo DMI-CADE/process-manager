@@ -40,6 +40,8 @@ class C_ChangeState(DmicCommand):
 
 class C_StartGame(DmicCommand):
     START_TRIES = 3
+    RETRY_START_APP_DELAY = 1
+    RETRY_VERIFIY_DELAY = 1
 
     def execute(self, data):
         logging.debug(f'[COMMAND: StartGame] Execute: {data=}')
@@ -47,24 +49,28 @@ class C_StartGame(DmicCommand):
         is_running = False
 
         if not self._pm.verify_closed(app_id):
-            logging.debug('[COMMAND: StartGame] game already running... closing game...')
+            logging.debug('[COMMAND: StartGame] Game already running... Closing game...')
             self._pm.close_app(app_id)
 
         for retry in range(self.START_TRIES):
             logging.debug(f'[COMMAND: StartGame] {retry=}')
 
+            self._pm.close_app(app_id)
+
             self._pm.start_app(app_id)
             is_running = self._pm.verify_running(app_id)
 
             if not is_running:
-                logging.debug('[COMMAND: StartGame] not initially verified as running...')
-                time.sleep(1)
+                logging.debug(f'[COMMAND: StartGame] Verifiy: {is_running=}; Wait ({self.RETRY_VERIFIY_DELAY})s and retry verify...')
+                time.sleep(self.RETRY_VERIFIY_DELAY)
                 is_running = self._pm.verify_running(app_id)
 
             logging.debug(f'[COMMAND: StartGame] {is_running=}')
 
             if is_running:
                 break
+
+            time.sleep(self.RETRY_START_APP_DELAY)
 
         return is_running
 
