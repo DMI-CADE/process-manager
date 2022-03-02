@@ -41,7 +41,7 @@ class C_ChangeState(DmicCommand):
 class C_StartGame(DmicCommand):
     START_TRIES = 3
     RETRY_START_APP_DELAY = 1
-    RETRY_VERIFIY_DELAY = 1
+    RETRY_VERIFIY_DELAY = 2 # Not lower then 2 for Godot games to be started-verified...
 
     def execute(self, data):
         logging.debug(f'[COMMAND: StartGame] Execute: {data=}')
