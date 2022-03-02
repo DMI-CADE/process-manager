@@ -35,7 +35,7 @@ class DmicStateMachine:
 
         while self._is_running:
             if len(self._task_queue) > 0:
-                logging.debug(f"""[STATEM] Task is queued:\n |- {self._current_state=}\n |- Tasks: {[n.type for n in self._task_queue]}""")
+                logging.debug(f"""[STATEM] Task is queued:\n |- self._current_state={type(self._current_state).__name__}\n |- Tasks: {[n.type for n in self._task_queue]}""")
                 task_is_ready = self._ready_task_buffer()
 
                 if task_is_ready:

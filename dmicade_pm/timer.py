@@ -56,7 +56,7 @@ class DmicTimer:
 
                 if self._elapsed_time > self._current_timer_length and not self._restart_timer:
                     self._is_running.clear()
-                    logging.info(f'[TIMER] Timer ran out! ({self._current_timer_length})s')
+                    logging.info(f'[TIMER] Timer ran out! ({self._current_timer_length})s, invoke: {[f.__name__ for f in self.alert_event._subs]}\n')
                     self.alert_event.update()
                 else:
                     time.sleep(self.TIMER_ACCURACY)

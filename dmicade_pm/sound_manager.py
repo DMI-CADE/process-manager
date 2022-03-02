@@ -49,7 +49,7 @@ class VolumeController():
 
         self._fade_time_delta = max_fade_duration / audio_level_steps
         logging.info(f'[VOLUME CONTROL] Start Volume fade from {self._audio_level}% to {self._audio_level_goal}% in {max_fade_duration}s')
-        logging.debug(f'[VOLUME CONTROL] {self._fade_time_delta=}')
+        logging.debug(f'[VOLUME CONTROL] {self._fade_time_delta=}\n')
 
     def _change_volume(self):
         """Waits for new audio level goal to be set. Then starts fading towards that level.
