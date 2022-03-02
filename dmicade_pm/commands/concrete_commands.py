@@ -156,6 +156,14 @@ class C_StopTimer(DmicCommand):
         self._pm.stop_timer()
 
 
+class C_SetVolume(DmicCommand):
+    def execute(self, data):
+        if data == 'min':
+            self._pm.set_volume(int(self._pm.config_loader.global_config['volume_perc_low']))
+        elif data == 'max':
+            self._pm.set_volume(int(self._pm.config_loader.global_config['volume_perc_high']))
+
+
 class C_EnterSleep(DmicCommand):
     def execute(self, data):
         self._pm.enter_sleep()

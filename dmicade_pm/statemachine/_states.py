@@ -77,11 +77,13 @@ class S_Start(DmicState):
         super().__init__(command_pool)
         self.cmd_change_state = command_pool.get_object('changestate')
         self.cmd_send_to_ui = command_pool.get_object('sendtoui')
+        self.cmd_set_volume = command_pool.get_object('setvolume')
 
     def enter(self):
         logging.debug('[STATE: START] Enter.')
         self.cmd_send_to_ui.execute(UI_MSG['boot_menu'])
         self.cmd_change_state.execute('inmenu')
+        self.cmd_set_volume.execute('min')
 
 
 class S_InMenu(DmicState):
