@@ -41,8 +41,9 @@ class VolumeController():
                 #f'but volume goal is already at {self._audio_level}%')
             return
 
+        # Assume last level goal as starting point to make fade time relative to the max fade distance.
+        audio_level_steps = abs(goal_perc - self._audio_level_goal)
         self._audio_level_goal = goal_perc
-        audio_level_steps = abs(goal_perc - self._audio_level)
         if audio_level_steps == 0:
             logging.warning(f'[VOLUME CONTROL] Something went wrong... {self._audio_level=} {self._audio_level_goal=} {audio_level_steps=}')
             return
