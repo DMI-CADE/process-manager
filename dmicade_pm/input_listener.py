@@ -14,6 +14,7 @@ class KeyboardListener:
 
     def __init__(self, config):
         self._listener = keyboard.Listener(on_press=self._on_press)
+        self._listener.name = 'KeyboardListener'
         self.keyboard_triggered_event = DmicEvent()
         self.menu_button_triggered_event = DmicEvent()
         self._menu_button = keyboard.KeyCode.from_char(config['menu_button'])
