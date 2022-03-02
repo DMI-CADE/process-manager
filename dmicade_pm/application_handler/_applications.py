@@ -105,7 +105,9 @@ class DmicAppExecutable(DmicApp):
         if 'exe' not in self.app_config:
             raise DmicAppNotConfiguredException(self.app_id)
 
-        return self.app_config['exe']
+        window_search_term = self.app_config['exe']
+        window_search_term = window_search_term.replace('.x86_64', '')
+        return window_search_term
 
     def _start_app(self, apps_path):
         logging.debug('[DMICAPP EXE] Start...')
