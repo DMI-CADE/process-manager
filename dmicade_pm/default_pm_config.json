@@ -8,6 +8,7 @@
 
     "sleep_time": "22:00",
     "wake_time": "08:00",
+    "----sleep_notification_interval": "900",
 
 
     "volume_perc_high": "100",

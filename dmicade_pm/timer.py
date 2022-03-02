@@ -89,7 +89,7 @@ class SleepManager():
         self._is_sleeping_time = False
         self._sleep_thread = None
 
-        self.notification_interval = 60
+        self.notification_interval = 900
         if 'sleep_notification_interval' in config:
             self.notification_interval = float(config['sleep_notification_interval'])
 
