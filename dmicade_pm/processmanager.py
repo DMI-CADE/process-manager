@@ -71,10 +71,10 @@ class DmicProcessManager:
         if self._interaction_feedback_active:
             self.queue_state_task(DmicTask(DmicTaskType.INTERACTION, data))
 
-    def set_interaction_feedback(self, is_on):
+    def set_interaction_feedback(self, is_on: bool):
         self._interaction_feedback_active = is_on
 
-    def set_timer(self, seconds):
+    def set_timer(self, seconds: int):
         self._timeout_timer.set_timer(seconds)
 
     def stop_timer(self):

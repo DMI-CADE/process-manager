@@ -3,7 +3,7 @@ import logging
 from abc import ABC
 from ..helper import ObjectPool
 from ..tasks import DmicTask, DmicTaskType
-from ..commands import DmicCommandPool
+from ..commands import *
 
 
 UI_MSG = {
@@ -21,9 +21,6 @@ UI_MSG = {
 
 class DmicState(ABC):
     """Abstract state class."""
-
-    def __init__(self, command_pool: DmicCommandPool):
-        self.command_pool = command_pool
 
     def enter(self) -> None:
         """Runs when entering the state."""
@@ -48,9 +45,9 @@ class DmicStatePool(ObjectPool):
 
     STATE_PREFIX = 'S_'
 
-    def __init__(self, command_pool: DmicCommandPool):
+    def __init__(self):
         """Constructor for class DmicStatePool."""
-        super().__init__(globals(), DmicState, self.STATE_PREFIX, command_pool)
+        super().__init__(globals(), DmicState, self.STATE_PREFIX)
 
         logging.debug(f'[STATE POOL]: {self._pool=}')
 
@@ -59,7 +56,6 @@ class DmicStatePool(ObjectPool):
 
 
 class S_Test(DmicState):
-
     def enter(self):
         logging.debug('[TEST STATE]: Enter')
 
@@ -73,35 +69,19 @@ class S_Test(DmicState):
 
 
 class S_Start(DmicState):
-    def __init__(self, command_pool):
-        super().__init__(command_pool)
-        self.cmd_change_state = command_pool.get_object('changestate')
-        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
-        self.cmd_set_volume = command_pool.get_object('setvolume')
-
     def enter(self):
         logging.debug('[STATE: START] Enter.')
-        self.cmd_send_to_ui.execute(UI_MSG['boot_menu'])
-        self.cmd_change_state.execute('inmenu')
-        self.cmd_set_volume.execute('min')
+        c_send_to_ui(UI_MSG['boot_menu'])
+        c_change_state('inmenu')
+        c_set_volume('min')
 
 
 class S_InMenu(DmicState):
-    def __init__(self, command_pool):
-        super().__init__(command_pool)
-        self.cmd_start_game = command_pool.get_object('startgame')
-        self.cmd_focus_app = command_pool.get_object('focusapp')
-        self.cmd_change_state = command_pool.get_object('changestate')
-        self.cmd_set_active_app = command_pool.get_object('setactiveapp')
-        self.cmd_set_timer_menu = command_pool.get_object('settimermenu')
-        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
-        self.cmd_verify_app = command_pool.get_object('verifyappisconfigured')
-
     def enter(self):
         logging.debug('[STATE: INMENU] Enter.')
         # TODO Focus menu
-        self.cmd_set_timer_menu.execute(None)
-        self.cmd_send_to_ui.execute(UI_MSG['activate_menu'])
+        c_set_timer_menu()
+        c_send_to_ui(UI_MSG['activate_menu'])
 
     def handle(self, task):
         logging.debug(f'[STATE: INMENU] Handle: {task=}')
@@ -111,73 +91,58 @@ class S_InMenu(DmicState):
             app_id = task.data
 
             # Verify app is configured
-            if not self.cmd_verify_app.execute(app_id):
+            if not c_verify_app_is_configured(app_id):
                 logging.warning(f'[STATE: INMENU] Could not start app "{app_id}": not configured...')
-                self.cmd_send_to_ui.execute(UI_MSG['app_not_found'])
+                c_send_to_ui(UI_MSG['app_not_found'])
                 return
 
             # Start app
-            app_started = self.cmd_start_game.execute(app_id)
-            self.cmd_send_to_ui.execute(UI_MSG['app_started'] + str(app_started).lower())
+            app_started = c_start_game(app_id)
+            c_send_to_ui(UI_MSG['app_started'] + str(app_started).lower())
 
             if app_started:
-                self.cmd_change_state.execute('ingame')
-                self.cmd_set_active_app.execute(app_id)
-                app_focused = self.cmd_focus_app.execute(app_id)
+                c_change_state('ingame')
+                c_set_active_app(app_id)
+                app_focused = c_focus_app(app_id)
                 if not app_focused:
                     logging.warning(f'[STATE: INMENU] Could not focus app: {app_id}')
                     # TODO handle app not focused
 
-                self.cmd_send_to_ui.execute(UI_MSG['deactivate_menu'])
+                c_send_to_ui(UI_MSG['deactivate_menu'])
 
             else:
                 logging.warning(f'[STATE: INMENU] Could not start app: {app_id}')
                 # TODO handle game not starting
 
         elif task.type is DmicTaskType.TIMEOUT:
-            self.cmd_change_state.execute('idle')
+            c_change_state('idle')
 
     def exit(self):
         logging.debug('[STATE: INMENU] Exit')
 
 
 class S_Idle(DmicState):
-    def __init__(self, command_pool):
-        super().__init__(command_pool)
-        self.cmd_change_state = command_pool.get_object('changestate')
-        self.cmd_stop_timer = command_pool.get_object('stoptimer')
-        self.cmd_set_interaction_feedback = command_pool.get_object('setinteractionfeedback')
-        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
-
     def enter(self):
-        self.cmd_set_interaction_feedback.execute(True)
-        self.cmd_stop_timer.execute(None)
-        self.cmd_send_to_ui.execute(UI_MSG['enter_idle'])
+        c_set_interaction_feedback(True)
+        c_stop_timer()
+        c_send_to_ui(UI_MSG['enter_idle'])
 
     def handle(self, task):
         if task.type is DmicTaskType.INTERACTION:
-            self.cmd_change_state.execute('inmenu')
-            self.cmd_set_interaction_feedback.execute(False)
-            self.cmd_send_to_ui.execute(UI_MSG['exit_idle'])
+            c_change_state('inmenu')
+            c_set_interaction_feedback(False)
+            c_send_to_ui(UI_MSG['exit_idle'])
 
         if task.type is DmicTaskType.SLEEP:
-            self.cmd_change_state.execute('sleep')
+            c_change_state('sleep')
 
     def exit(self):
-        self.cmd_set_interaction_feedback.execute(False)
+        c_set_interaction_feedback(False)
 
 
 class S_InGame(DmicState):
-    def __init__(self, command_pool):
-        super().__init__(command_pool)
-        self.cmd_close_game = command_pool.get_object('closegame')
-        self.cmd_change_state = command_pool.get_object('changestate')
-        self.cmd_set_timer_game = command_pool.get_object('settimergame')
-        self.cmd_set_active_app = command_pool.get_object('setactiveapp')
-        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
-
     def enter(self):
-        self.cmd_set_timer_game.execute(None)
+        c_set_timer_game()
 
     def handle(self, task):
         logging.debug(f'[STATE: INGAME] Handle: {task=}')
@@ -191,27 +156,21 @@ class S_InGame(DmicState):
 
     def _go_to_menu(self, task, msg_id):
         app_id = task.data
-        self.cmd_close_game.execute(app_id)
-        self.cmd_send_to_ui.execute(UI_MSG[msg_id])
-        self.cmd_change_state.execute('inmenu')
+        c_close_game(app_id)
+        c_send_to_ui(UI_MSG[msg_id])
+        c_change_state('inmenu')
 
     def exit(self):
-        self.cmd_set_active_app.execute(None)
+        c_set_active_app(None)
 
 class S_Sleep(DmicState):
-    def __init__(self, command_pool):
-        super().__init__(command_pool)
-        self.cmd_change_state = command_pool.get_object('changestate')
-        self.cmd_enter_sleep = command_pool.get_object('entersleep')
-        self.cmd_send_to_ui = command_pool.get_object('sendtoui')
-
     def enter(self):
-        self.cmd_enter_sleep.execute(None)
+        c_enter_sleep()
 
     def handle(self, task):
         logging.debug(f'[STATE: SLEEP] Handle: {task=}')
         if task.type is DmicTaskType.WAKE:
-            self.cmd_change_state.execute('inmenu')
+            c_change_state('inmenu')
 
     def exit(self):
-        self.cmd_send_to_ui.execute(UI_MSG['exit_idle'])
+        c_send_to_ui(UI_MSG['exit_idle'])

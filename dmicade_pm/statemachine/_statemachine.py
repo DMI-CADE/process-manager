@@ -15,8 +15,8 @@ class DmicStateMachine:
 
     TASK_CHECK_DELAY = 0.05
 
-    def __init__(self, command_pool):
-        self._state_pool = DmicStatePool(command_pool)
+    def __init__(self):
+        self._state_pool = DmicStatePool()
         self._current_state = self._state_pool.get_object('start')
         self._task_queue = []
         self._is_running = False

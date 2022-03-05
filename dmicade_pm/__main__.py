@@ -6,7 +6,7 @@ from .helper import parse_command_line_arguments
 from .processmanager import DmicProcessManager
 from .statemachine import DmicStateMachine
 from .tasks import DmicTask
-from .commands import DmicCommandPool
+from .commands import commands_set_pm
 from .uds_server import UdsServer
 from .message_parser import DmicMessageParser
 from .config_loader import DmicConfigLoader
@@ -46,8 +46,8 @@ class Client:
         self._uds_server = UdsServer(self.SOCKET_PATH)
         self._message_parser = DmicMessageParser(self._uds_server)
         self._process_manager = DmicProcessManager(self, self._uds_server, self._config_loader)
-        self._command_pool = DmicCommandPool(self._process_manager)
-        self._state_machine = DmicStateMachine(self._command_pool)
+        commands_set_pm(self._process_manager)
+        self._state_machine = DmicStateMachine()
 
         self._message_parser.received_task_event += self.queue_state_task
 
