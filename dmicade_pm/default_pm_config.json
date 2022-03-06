@@ -5,6 +5,8 @@
     "menu_timeout": "600",
     "game_timeout": "300",
     "menu_button": "m",
+    "button_colors_menu": {"P1F": "FA0"},
+    "button_colors_app_default": {"ALL": "DDD"},
 
     "sleep_time": "22:00",
     "wake_time": "08:00",

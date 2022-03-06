@@ -3,6 +3,7 @@ from .application_handler import DmicApplicationHandler
 from .timer import DmicTimer, SleepManager
 from .input_listener import KeyboardListener
 from .sound_manager import VolumeController
+from .button_controller import DmicButtonController
 
 
 class DmicProcessManager:
@@ -18,6 +19,7 @@ class DmicProcessManager:
         self._sleep_manager = SleepManager(config_loader.global_config)
         self._key_listener = KeyboardListener(config_loader.global_config)
         self._volume_controller = VolumeController()
+        self._button_controller = DmicButtonController()
 
         self._interaction_feedback_active = False
 
@@ -93,8 +95,13 @@ class DmicProcessManager:
         self._volume_controller.set_volume(perc)
 
     def set_volume_timer(self, seconds):
-        self._dyn_volume_timer.set_timer()
+        self._dyn_volume_timer.set_timer(seconds)
 
+    def set_button_colors(self, color_data):
+        self._button_controller.change_colors(color_data)
+
+    def queue_clear_button_colors(self):
+        self._button_controller.queue_clear()
 
     # Following functions violate the state model... But it had to be done...
 

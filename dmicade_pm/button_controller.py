@@ -6,18 +6,43 @@ class DmicButtonController():
 
     def __init__(self):
         self.current_colors = ['000000' for i in range(12)]
-        pass
+
+        self._clear_queued = False
 
     def change_colors(self, color_data):
         logging.debug(f"[BUTTON CONTROLLER] Convert Colors: {color_data=}")
         self.current_colors = self.convert_color_data(color_data)
         logging.info(f"[BUTTON CONTROLLER] Apply Colors: {self.current_colors}")
+        # TODO: send color information
 
-    def convert_color_data(self, data: object):
-        color_data = self.current_colors.copy()
+    def clear_colors(self):
+        self.change_colors('000000;'*12)
+
+    def queue_clear(self):
+        self._clear_queued = True
+
+
+    def convert_color_data(self, data: any):
+        color_data = None
+        if self._clear_queued:
+            color_data = ['000000' for i in range(12)]
+            self._clear_queued = False
+        else:
+            color_data = self.current_colors.copy()
 
         if type(data) is dict:
+
+            # An "ALL" keyword inside a dict sets all color values to the given one as a base.
+            if 'ALL' in data:
+                c = self.get_hex_str(data['ALL'])
+                color_data = [c for i in range(12)]
+
             for key in data:
+
+                # Skip keywords.
+                if key == 'ALL':
+                    continue
+
                 if not re.match('^P[12][A-F]$', key):
                     logging.warning(f'[BUTTON CONTROLLER] ApplyColorData: "{key}" does not match button descriptor pattern ( ^P[12][A-F]$ ). Color ingnored.')
                     continue

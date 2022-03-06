@@ -137,3 +137,40 @@ def c_set_volume(to: str):
 
 def c_enter_sleep():
     _PM.enter_sleep()
+
+
+def c_get_color_config(app_id):
+    app_config = _PM.config_loader.configs[app_id]
+    color_config = None
+    if 'buttonColors' in app_config:
+        color_config = app_config['buttonColors']
+
+    return color_config
+
+
+def c_change_button_colors(color_data):
+    logging.debug(f'[COMMAND: ChangeButtonColors] {color_data}')
+    _PM.set_button_colors(color_data)
+
+
+def c_button_colors_queue_clear():
+    _PM.queue_clear_button_colors()
+
+
+def c_set_app_button_colors(app_id):
+    color_data = c_get_color_config(app_id)
+
+    # If nothing is configured, set clear
+    c_button_colors_queue_clear()
+
+    if not color_data and 'button_colors_app_default' in _PM.config_loader.global_config:
+        color_data = _PM.config_loader.global_config['button_colors_app_default']
+
+    print(f"{color_data=}")
+    c_change_button_colors(color_data)
+
+
+def c_set_menu_button_colors():
+    color_config = _PM.config_loader.global_config['button_colors_menu']
+    c_button_colors_queue_clear()
+    c_change_button_colors(color_config)

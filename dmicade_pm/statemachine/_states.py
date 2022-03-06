@@ -72,8 +72,8 @@ class S_Start(DmicState):
     def enter(self):
         logging.debug('[STATE: START] Enter.')
         c_send_to_ui(UI_MSG['boot_menu'])
-        c_change_state('inmenu')
         c_set_volume('min')
+        c_change_state('inmenu')
 
 
 class S_InMenu(DmicState):
@@ -82,6 +82,7 @@ class S_InMenu(DmicState):
         # TODO Focus menu
         c_set_timer_menu()
         c_send_to_ui(UI_MSG['activate_menu'])
+        c_set_menu_button_colors()
 
     def handle(self, task):
         logging.debug(f'[STATE: INMENU] Handle: {task=}')
@@ -107,6 +108,8 @@ class S_InMenu(DmicState):
                 if not app_focused:
                     logging.warning(f'[STATE: INMENU] Could not focus app: {app_id}')
                     # TODO handle app not focused
+
+                c_set_app_button_colors(app_id)
 
                 c_send_to_ui(UI_MSG['deactivate_menu'])
 
