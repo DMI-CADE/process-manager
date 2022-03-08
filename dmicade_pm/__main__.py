@@ -10,11 +10,13 @@ from .commands import commands_set_pm
 from .uds_server import UdsServer
 from .message_parser import DmicMessageParser
 from .config_loader import DmicConfigLoader
-from .logging_manager import *
+from .logging_manager import DmicLogging
 
 def main():
     print(__import__('os').getcwd())
     parsed_args = parse_command_line_arguments(sys.argv)
+    logger = DmicLogging(parsed_args)
+    logger.setup()
     client = Client(parsed_args)
 
     debug_mode = 'debug' in parsed_args
@@ -69,3 +71,29 @@ class Client:
 
 
 main()
+
+
+def test_udsserver():
+    print('[Client] Connecting to unix domain socket')
+    server = UdsServer(Client.SOCKET_PATH)
+
+    server.connected_event += lambda x: print('[Client] udsServer: Connected!')
+    server.received_event += lambda msg: print('[Client] udsServer: Received: ', msg)
+    server.disconnected_event += lambda x: print('[Client] udsServer: Disconnected...')
+
+    server.start()
+
+    while not server.is_connected():
+        pass
+    print('Connected!')
+
+    # Test
+    msg = ''
+    while msg != 'exit' and server.is_connected():
+        print('Send: ')
+        msg = input()
+        server.send(msg)
+
+    server.close()
+
+# test_udsserver()
