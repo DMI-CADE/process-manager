@@ -10,24 +10,7 @@ from .commands import commands_set_pm
 from .uds_server import UdsServer
 from .message_parser import DmicMessageParser
 from .config_loader import DmicConfigLoader
-
-
-# Set default loglevel.
-numeric_log_level = getattr(logging, 'INFO', None)
-
-# Handle command line arguments.
-for arg in sys.argv:
-
-    # Set log level.
-    if arg.find('--log=') == 0:
-        loglevel = arg[6:]
-        numeric_log_level = getattr(logging, loglevel.upper(), None)
-        if not isinstance(numeric_log_level, int):
-            raise ValueError('Invalid log level: %s' % loglevel)
-
-logging.basicConfig(level=numeric_log_level,
-                    format='%(asctime)s - (%(threadName)-9s) %(levelname)s:%(name)s:%(filename)s: %(message)s',)
-
+from .logging_manager import *
 
 def main():
     print(__import__('os').getcwd())
@@ -69,7 +52,7 @@ class Client:
 
         logging.debug('[PM CLIENT] Close uds server...')
         self._uds_server.close()
-        logging.debug('[PM CLIENT] Done...')
+        logging.debug('[PM CLIENT] Done...\n')
 
     def queue_state_task(self, task: DmicTask):
         self._state_machine.queue_task_for_state(task)
