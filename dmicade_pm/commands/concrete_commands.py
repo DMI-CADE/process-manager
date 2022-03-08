@@ -166,7 +166,6 @@ def c_set_app_button_colors(app_id):
     if not color_data and 'button_colors_app_default' in _PM.config_loader.global_config:
         color_data = _PM.config_loader.global_config['button_colors_app_default']
 
-    print(f"{color_data=}")
     c_change_button_colors(color_data)
 
 
