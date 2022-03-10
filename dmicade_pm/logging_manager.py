@@ -14,10 +14,15 @@ class DmicLogging():
         if 'logs' in user_args:
             self.log_folder = user_args['logs']
 
-
         self.logFormatter = logging.Formatter(self.FORMAT)
 
     def setup(self):
+
+        try:
+            os.mkdir(self.log_folder)
+            print('Created log folder: ', os.path.abspath(self.log_folder))
+        except FileExistsError as e:
+            print('Logging to: ', os.path.abspath(self.log_folder))
 
         # Set default loglevel.
         numeric_log_level = getattr(logging, 'INFO', None)
@@ -34,16 +39,16 @@ class DmicLogging():
 
         rootLogger = logging.getLogger()
         rootLogger.setLevel(numeric_log_level)
+        
+        consoleHandler = logging.StreamHandler()
+        consoleHandler.setFormatter(self.logFormatter)
+        rootLogger.addHandler(consoleHandler)
 
         current_datetime_suffix = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
         log_file_path = os.path.join(self.log_folder, self.FILE_NAME_FORMAT % current_datetime_suffix)
-        print(log_file_path)
+        logging.info(f'[LOGGING MANAGER]: log to: {log_file_path}')
 
         fileHandler = logging.FileHandler(log_file_path)
         fileHandler.setFormatter(self.logFormatter)
         fileHandler.setLevel(logging.INFO)
         rootLogger.addHandler(fileHandler)
-
-        consoleHandler = logging.StreamHandler()
-        consoleHandler.setFormatter(self.logFormatter)
-        rootLogger.addHandler(consoleHandler)
