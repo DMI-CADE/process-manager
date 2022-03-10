@@ -5,6 +5,7 @@
     "menu_timeout": "600",
     "game_timeout": "300",
     "menu_button": "m",
+    "serial_port": "COM3",
     "button_colors_menu": {"P1F": "FA0"},
     "button_colors_app_default": {"ALL": "DDD"},
 

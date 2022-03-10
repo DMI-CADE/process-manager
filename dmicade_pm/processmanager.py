@@ -4,6 +4,7 @@ from .timer import DmicTimer, SleepManager
 from .input_listener import KeyboardListener
 from .sound_manager import VolumeController
 from .button_controller import DmicButtonController
+from .serial_connection import DmicSerialConnector
 
 
 class DmicProcessManager:
@@ -19,7 +20,8 @@ class DmicProcessManager:
         self._sleep_manager = SleepManager(config_loader.global_config)
         self._key_listener = KeyboardListener(config_loader.global_config)
         self._volume_controller = VolumeController()
-        self._button_controller = DmicButtonController()
+        self._serial_connector = DmicSerialConnector(port=config_loader.global_config['serial_port'])
+        self._button_controller = DmicButtonController(self._serial_connector)
 
         self._interaction_feedback_active = False
 

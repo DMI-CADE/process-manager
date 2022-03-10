@@ -1,24 +1,35 @@
 import logging
 import re
 
+from .serial_connection import DmicSerialConnector
+
 
 class DmicButtonController():
 
-    def __init__(self):
+    def __init__(self, serial_connector:DmicSerialConnector):
         self.current_colors = ['000000' for i in range(12)]
 
         self._clear_queued = False
+        self.serial_connector = serial_connector
 
     def change_colors(self, color_data):
+        """Connverts give color data and sends it to the connected serial connection."""
+
         logging.debug(f"[BUTTON CONTROLLER] Convert Colors: {color_data=}")
         self.current_colors = self.convert_color_data(color_data)
         logging.info(f"[BUTTON CONTROLLER] Apply Colors: {self.current_colors}")
-        # TODO: send color information
+
+        str_data = ';'.join(self.current_colors) + ';'
+        self.serial_connector.write_data(str_data)
 
     def clear_colors(self):
+        """Changes all color data do clear/black."""
+
         self.change_colors('000000;'*12)
 
     def queue_clear(self):
+        """Queues all clear color data as base for next color change."""
+
         self._clear_queued = True
 
 
