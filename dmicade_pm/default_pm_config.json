@@ -16,7 +16,7 @@
     "volume_perc_high": "100",
     "volume_perc_low": "0",
 
-    "volume_up_fade_duration": "15",
+    "volume_up_fade_duration": "5",
     "volume_time_until_lowering": "30",
     "volume_down_fade_duration": "15",
     "volume_time_until_lowering_in_sleephours": "15",
