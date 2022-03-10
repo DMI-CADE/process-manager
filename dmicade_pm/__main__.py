@@ -17,11 +17,18 @@ def main():
     parsed_args = parse_command_line_arguments(sys.argv)
     logger = DmicLogging(parsed_args)
     logger.setup()
-    client = Client(parsed_args)
 
-    debug_mode = 'debug' in parsed_args
-    client.start(debug_mode)
+    try:
+        client = Client(parsed_args)
 
+        debug_mode = 'debug' in parsed_args
+
+        client.start(debug_mode)
+
+    except Exception as e:
+        logging.exception(e)
+
+    logging.info('[MAIN]: Exit...')
 
 class Client:
     SOCKET_PATH = '/tmp/dmicade_socket.s'
