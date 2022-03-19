@@ -48,10 +48,13 @@ class DmicButtonController():
                 c = self.get_hex_str(data['ALL'])
                 color_data = [c for i in range(12)]
 
+            if 'RAINBOW' in data:
+                return 'rainbow;'
+
             for key in data:
 
                 # Skip keywords.
-                if key == 'ALL':
+                if key in ['ALL']:
                     continue
 
                 if not re.match('^P[12][A-F]$', key):
