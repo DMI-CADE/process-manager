@@ -21,7 +21,7 @@ class DmicProcessManager:
         self._key_listener = KeyboardListener(config_loader.global_config)
         self._volume_controller = VolumeController()
         self._serial_connector = DmicSerialConnector(port=config_loader.global_config['serial_port'])
-        self._button_controller = DmicButtonController(self._serial_connector)
+        self._button_controller = DmicButtonController(config_loader.global_config, self._serial_connector)
 
         self._interaction_feedback_active = False
 

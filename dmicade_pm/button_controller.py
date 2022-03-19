@@ -6,26 +6,38 @@ from .serial_connection import DmicSerialConnector
 
 class DmicButtonController():
 
-    def __init__(self, serial_connector:DmicSerialConnector):
+    def __init__(self, global_config, serial_connector:DmicSerialConnector):
         self.current_colors = ['000000' for i in range(12)]
 
+        self._color_order = global_config['button_led_order']
         self._clear_queued = False
         self.serial_connector = serial_connector
 
-    def change_colors(self, color_data):
+    def change_colors(self, color_data:any):
         """Connverts give color data and sends it to the connected serial connection."""
 
-        logging.debug(f"[BUTTON CONTROLLER] Convert Colors: {color_data=}")
+        # Special cases
+        if 'RAINBOW' in color_data:
+            logging.info(f"[BUTTON CONTROLLER] Apply Colors: rainbow")
+            str_data = 'rainbow;'
+            logging.debug(f"[BUTTON CONTROLLER] Send color data: '{str_data}'")
+            self.serial_connector.write_data(str_data)
+            return
+
+        # Convert, order and send data.
         self.current_colors = self.convert_color_data(color_data)
         logging.info(f"[BUTTON CONTROLLER] Apply Colors: {self.current_colors}")
 
-        str_data = ';'.join(self.current_colors) + ';'
+        str_data = ';'.join(self.order_color_data(self.current_colors)) + ';'
+        logging.debug(f"[BUTTON CONTROLLER] Send color data: '{str_data}'")
         self.serial_connector.write_data(str_data)
+
 
     def clear_colors(self):
         """Changes all color data do clear/black."""
 
         self.change_colors('000000;'*12)
+
 
     def queue_clear(self):
         """Queues all clear color data as base for next color change."""
@@ -48,13 +60,10 @@ class DmicButtonController():
                 c = self.get_hex_str(data['ALL'])
                 color_data = [c for i in range(12)]
 
-            if 'RAINBOW' in data:
-                return 'rainbow;'
-
             for key in data:
 
                 # Skip keywords.
-                if key in ['ALL']:
+                if key in []:
                     continue
 
                 if not re.match('^P[12][A-F]$', key):
@@ -102,3 +111,8 @@ class DmicButtonController():
             result = None
 
         return result
+
+    def order_color_data(self, color_data:list) -> list:
+        """Orders color data by led order set in the global config."""
+
+        return [color_data[6 * (int(pos_key[1]) - 1) + 'ABCDEF'.index(pos_key[2])] for pos_key in self._color_order]
