@@ -63,7 +63,7 @@ class DmicButtonController():
             for key in data:
 
                 # Skip keywords.
-                if key in []:
+                if key in ['ALL']:
                     continue
 
                 if not re.match('^P[12][A-F]$', key):
