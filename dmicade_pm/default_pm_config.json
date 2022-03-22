@@ -5,7 +5,7 @@
     "menu_timeout": "600",
     "game_timeout": "300",
     "menu_button": "m",
-    "serial_port": "COM3",
+    "serial_port": "/dev/ttyACM0",
     "button_led_order": ["P1A", "P1B", "P1C", "P1F", "P1E", "P1D", "P2A", "P2B", "P2C", "P2F", "P2E", "P2D"],
     "button_colors_menu": {"P1F": "FA0"},
     "button_colors_app_default": {"ALL": "DDD"},

@@ -1,6 +1,7 @@
 import sys
 import threading
 import logging
+import json
 
 from .helper import parse_command_line_arguments
 from .processmanager import DmicProcessManager
