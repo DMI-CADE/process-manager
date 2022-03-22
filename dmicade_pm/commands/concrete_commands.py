@@ -173,3 +173,8 @@ def c_set_menu_button_colors():
     color_config = _PM.config_loader.global_config['button_colors_menu']
     c_button_colors_queue_clear()
     c_change_button_colors(color_config)
+
+
+def c_clear_button_colors():
+    c_button_colors_queue_clear()
+    c_change_button_colors({})

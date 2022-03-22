@@ -97,6 +97,8 @@ class S_InMenu(DmicState):
                 c_send_to_ui(UI_MSG['app_not_found'])
                 return
 
+            c_clear_button_colors()
+
             # Start app
             app_started = c_start_game(app_id)
             c_send_to_ui(UI_MSG['app_started'] + str(app_started).lower())
@@ -115,6 +117,7 @@ class S_InMenu(DmicState):
 
             else:
                 logging.warning(f'[STATE: INMENU] Could not start app: {app_id}')
+                c_set_menu_button_colors()
                 # TODO handle game not starting
 
         elif task.type is DmicTaskType.TIMEOUT:
