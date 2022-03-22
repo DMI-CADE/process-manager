@@ -70,9 +70,49 @@ class Client:
     def _debug(self):
 
         input_str = ''
+        color_quickswitch_active = False
+        cqs_field = ''
 
         while input_str != 'exit':
             input_str = input()
+
+            try:
+                if color_quickswitch_active:
+                    if input_str == 'q':
+                        color_quickswitch_active = False
+                        print("EXITED COLOR QUICK SWITCH!")
+                        continue
+
+                    color_data = {cqs_field: input_str}
+                    self._process_manager.set_button_colors(color_data)
+
+                    continue
+
+                elif input_str.find('btnc_qs') == 0 and len(input_str[8:]) > 0:
+                    color_quickswitch_active = True
+                    cqs_field = input_str[8:]
+                    print("ENTERED COLOR QUICK SWITCH!")
+                    continue
+
+                elif input_str.find('btnc_s') == 0:
+                    color_data = {input_str[7:10]: input_str[11:]}
+                    self._process_manager.set_button_colors(color_data)
+
+                elif input_str.find('btnc_c') == 0 and len(input_str[7:]) > 0:
+                    cl = DmicConfigLoader(parse_command_line_arguments(sys.argv))
+                    app_config = cl.configs[input_str[7:]]
+                    color_data = app_config['buttonColors']
+                    self._process_manager.queue_clear_button_colors()
+                    self._process_manager.set_button_colors(color_data)
+
+                elif input_str.find('btnc') == 0:
+                    color_data = json.loads(input_str[5:])
+                    print(color_data)
+                    self._process_manager.set_button_colors(color_data)
+
+            except Exception as e:
+                print(e)
+
             self._message_parser.parse_uds_message(input_str)
 
         self._state_machine.stop_event_loop()
