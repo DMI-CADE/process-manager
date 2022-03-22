@@ -11,6 +11,7 @@ class DmicSerialConnector():
 
         try:
             self._connection = serial.Serial(port=port, baudrate=9600, timeout=.1)
+            time.sleep(3)
         except serial.SerialException as se:
             logging.warning(se)
 
