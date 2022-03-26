@@ -20,3 +20,6 @@ class DmicSerialConnector():
             self._connection.write(bytes(data_str, 'utf-8'))
 
         time.sleep(0.05)
+        
+    def read_data(self):
+        return self._connection.readline()
