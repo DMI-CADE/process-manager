@@ -40,6 +40,7 @@ class DmicTemperatureLogging():
             logging.warning('[TEMPERATURE LOGGING] Could not connect..')
             return
 
+        logging.info(f'[TEMPERATURE LOGGING] Connected! port={self._port}')
         self._logging_setup()
         self.logger.info('Start Temperature Logging...')
         
@@ -49,6 +50,7 @@ class DmicTemperatureLogging():
         
         while self.is_running:
             msg = self.serial_connector.read_data()
-            self.logger.info(msg)
+            if len(msg) > 0:
+                self.logger.info(msg)
 
-            time.sleep(1)
+            time.sleep(5)
