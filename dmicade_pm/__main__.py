@@ -12,6 +12,7 @@ from .uds_server import UdsServer
 from .message_parser import DmicMessageParser
 from .config_loader import DmicConfigLoader
 from .logging_manager import DmicLogging
+from .temperature_logging import DmicTemperatureLogging
 
 def main():
     print(__import__('os').getcwd())
@@ -21,6 +22,7 @@ def main():
 
     try:
         client = Client(parsed_args)
+        tempLogging = DmicTemperatureLogging(client._config_loader.global_config)
 
         debug_mode = 'debug' in parsed_args
 

@@ -59,10 +59,10 @@ class DmicLogging():
         log_file_path = os.path.join(self.log_folder, self.FILE_NAME_FORMAT % current_datetime_suffix)
         logging.info(f'[LOGGING MANAGER]: log to: {log_file_path}')
 
-        fileHandler = logging.FileHandler(log_file_path)
-        fileHandler.setFormatter(log_formatter)
-        fileHandler.setLevel(logging.INFO)
-        root_logger.addHandler(fileHandler)
+        file_handler = logging.FileHandler(log_file_path)
+        file_handler.setFormatter(log_formatter)
+        file_handler.setLevel(logging.INFO)
+        root_logger.addHandler(file_handler)
 
 
 class DmicConsoleFormatter(logging.Formatter):
