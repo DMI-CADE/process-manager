@@ -96,6 +96,7 @@ class DmicStateMachine:
         self._current_state.exit()
 
         logging.info(f'[STATEM] Change state to {state_name}.')
+        logging.getLogger('temp_logger').info(f'Change state to {state_name}.')
         self._current_state = self._state_pool.get_object(state_name)
         logging.debug(f'[STATEM] Enter state: {self._current_state}')
         self._current_state.enter()
