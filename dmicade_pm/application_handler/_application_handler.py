@@ -114,16 +114,16 @@ class DmicApplicationHandler:
         """Closes an application."""
 
         logging.debug(f'[APP HANDLER] Close: {app_id}...')
+        if app_id in self.running_apps:
+            self.running_apps[app_id].stop()
+            del self.running_apps[app_id]
+
         window_search_term = dmic_app_process_factory(app_id, self._config_loader.configs[app_id]).get_window_search_term()
         try:
             logging.debug(f'[APP HANDLER] Windowkill: {window_search_term}...')
             sp_check_output(self.CMD_KILL_WINDOW % window_search_term)
         except subprocess.CalledProcessError as e:
-            logging.warning(f'[APP HANDLER] close app subprocess error: {e}')
-
-        if app_id in self.running_apps:
-            self.running_apps[app_id].stop()
-            del self.running_apps[app_id]
+            logging.debug(f'[APP HANDLER] close app subprocess error: {e}')
 
     def verify_closed(self, app_id):
         """Checks if an application is closed."""
