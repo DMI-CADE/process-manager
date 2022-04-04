@@ -117,6 +117,10 @@ class Client:
                     print(color_data)
                     self._process_manager.set_button_colors(color_data)
 
+                elif input_str.find('apps') == 0:
+                    print( list(self._config_loader.configs.keys()) )
+                    continue
+
             except Exception as e:
                 print(e)
 
