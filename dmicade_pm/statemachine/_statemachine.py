@@ -3,7 +3,7 @@ import time
 
 from ._states import DmicStatePool
 from ..tasks import DmicTask, DmicTaskType
-
+from ..temperature_logging import DmicTemperatureLogging
 
 class DmicStateMachine:
     """Statemachine of the processmanager.
@@ -15,12 +15,15 @@ class DmicStateMachine:
 
     TASK_CHECK_DELAY = 0.05
 
-    def __init__(self):
+    def __init__(self, global_conf=None):
         self._state_pool = DmicStatePool()
         self._current_state = self._state_pool.get_object('start')
         self._task_queue = []
         self._is_running = False
         self._active_app = None
+
+        self._gconf = global_conf # TEMPLOGGING
+        self.temp_logging = DmicTemperatureLogging(self._gconf) # TEMPLOGGING
 
     def run_event_loop_sync(self):
         """Runs synchronous state machine loop.
@@ -75,6 +78,9 @@ class DmicStateMachine:
             print()
         logging.info(f'[STATEM] Execute Task: {current_task.type.name}, {current_task.data}')
 
+        if current_task.type is DmicTaskType.WAKE: # TEMPLOGGING
+            self.temp_logging = DmicTemperatureLogging(self._gconf) # TEMPLOGGING
+
         if current_task.type is DmicTaskType.SET_ACTIVE_APP:
             self._active_app = current_task.data
         elif current_task.type is DmicTaskType.CHANGE_STATE:
@@ -96,7 +102,10 @@ class DmicStateMachine:
         self._current_state.exit()
 
         logging.info(f'[STATEM] Change state to {state_name}.')
-        logging.getLogger('temp_logger').info(f'Change state to {state_name}.')
+        logging.getLogger('temp_logger').info(f'Change state to {state_name}.') # TEMPLOGGING
+        if state_name == 'sleep': # TEMPLOGGING
+            self.temp_logging.stop() # TEMPLOGGING
+            self.temp_logging = None  # TEMPLOGGING
         self._current_state = self._state_pool.get_object(state_name)
         logging.debug(f'[STATEM] Enter state: {self._current_state}')
         self._current_state.enter()

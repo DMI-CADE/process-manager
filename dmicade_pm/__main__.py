@@ -12,7 +12,6 @@ from .uds_server import UdsServer
 from .message_parser import DmicMessageParser
 from .config_loader import DmicConfigLoader
 from .logging_manager import DmicLogging
-from .temperature_logging import DmicTemperatureLogging
 
 def main():
     parsed_args = parse_command_line_arguments(sys.argv)
@@ -27,7 +26,6 @@ def main():
 
     try:
         client = Client(parsed_args)
-        tempLogging = DmicTemperatureLogging(client._config_loader.global_config)
 
         debug_mode = 'debug' in parsed_args
 
@@ -47,7 +45,7 @@ class Client:
         self._message_parser = DmicMessageParser(self._uds_server)
         self._process_manager = DmicProcessManager(self, self._uds_server, self._config_loader)
         commands_set_pm(self._process_manager)
-        self._state_machine = DmicStateMachine()
+        self._state_machine = DmicStateMachine(self._config_loader.global_config)
 
         self._message_parser.received_task_event += self.queue_state_task
 

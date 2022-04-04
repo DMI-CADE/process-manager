@@ -54,3 +54,8 @@ class DmicTemperatureLogging():
                 self.logger.info(msg)
 
             time.sleep(5)
+
+    def stop(self):
+        self.is_running = False
+        time.sleep(6)
+        self.logger.handlers.clear()
