@@ -1,5 +1,6 @@
 import time
 import logging
+import os
 
 from ..processmanager import DmicProcessManager
 from ..tasks import DmicTask, DmicTaskType
@@ -136,6 +137,7 @@ def c_set_volume(to: str):
 
 
 def c_enter_sleep():
+    os.sync()
     _PM.enter_sleep()
 
 

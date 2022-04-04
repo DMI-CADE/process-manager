@@ -123,6 +123,10 @@ class S_InMenu(DmicState):
         elif task.type is DmicTaskType.TIMEOUT:
             c_change_state('idle')
 
+        elif task.type is DmicTaskType.CLOSE_APP:
+            os.sync()
+            logging.debug('[STATE: INMENU] \033[1m --- OS Synched! Ready for shutdown... --- \033[0m')
+
     def exit(self):
         logging.debug('[STATE: INMENU] Exit')
 
