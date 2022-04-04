@@ -88,7 +88,7 @@ class UdsServer:
                 self._client_conn.shutdown(socket.SHUT_WR)
                 self._client_conn.close()
             except socket.error:
-                logging.debug('[UDS SERVER] Shutdown failed.')
+                logging.warning('[UDS SERVER] Shutdown failed.')
                 pass
 
             self._connected = False

@@ -73,7 +73,8 @@ class DmicConsoleFormatter(logging.Formatter):
         lvl_name_sub = re.search(r'%\(levelname\)[^s]*s', self._fmt)[0]
         self.info_fmt = fmt.replace(lvl_name_sub, ccolors.OKCYAN + lvl_name_sub + ccolors.ENDC)
         self.debug_fmt = fmt.replace(lvl_name_sub, ccolors.OKBLUE + lvl_name_sub + ccolors.ENDC)
-        self.warning_fmt = fmt.replace(lvl_name_sub, ccolors.FAIL + lvl_name_sub + ccolors.ENDC)
+        self.warning_fmt = fmt.replace(lvl_name_sub, ccolors.WARNING + lvl_name_sub + ccolors.ENDC)
+        self.error_fmt = fmt.replace(lvl_name_sub, ccolors.FAIL + lvl_name_sub + ccolors.ENDC)
 
 
     def format(self, record):
@@ -88,8 +89,11 @@ class DmicConsoleFormatter(logging.Formatter):
         elif record.levelno == logging.INFO:
             self._fmt = self.info_fmt
 
-        elif record.levelno == logging.ERROR or record.levelno == logging.WARNING:
+        elif record.levelno == logging.WARNING:
             self._fmt = self.warning_fmt
+
+        elif record.levelno == logging.ERROR or record.levelno == logging.WARNING:
+            self._fmt = self.error_fmt
 
         logging.Formatter.__init__(self, self._fmt)
         result = logging.Formatter.format(self, record)

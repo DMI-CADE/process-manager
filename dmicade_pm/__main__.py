@@ -32,7 +32,7 @@ def main():
         client.start(debug_mode)
 
     except Exception as e:
-        logging.exception(e)
+        logging.error(e)
 
     logging.info('[MAIN]: Exit...')
 
