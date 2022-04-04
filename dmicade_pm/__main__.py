@@ -15,8 +15,13 @@ from .logging_manager import DmicLogging
 from .temperature_logging import DmicTemperatureLogging
 
 def main():
-    print(__import__('os').getcwd())
     parsed_args = parse_command_line_arguments(sys.argv)
+
+    if 'conf' in parsed_args:
+        print(json.dumps(DmicConfigLoader(parsed_args).global_config, indent=4))
+        return
+
+    print(__import__('os').getcwd())
     logger = DmicLogging(parsed_args)
     logger.setup()
 
