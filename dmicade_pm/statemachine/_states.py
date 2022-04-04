@@ -136,6 +136,7 @@ class S_Idle(DmicState):
         c_set_interaction_feedback(True)
         c_stop_timer()
         c_send_to_ui(UI_MSG['enter_idle'])
+        c_change_button_colors({"RAINBOW": True})
 
     def handle(self, task):
         if task.type is DmicTaskType.INTERACTION:
@@ -175,6 +176,7 @@ class S_InGame(DmicState):
 
 class S_Sleep(DmicState):
     def enter(self):
+        c_clear_button_colors()
         c_enter_sleep()
 
     def handle(self, task):
