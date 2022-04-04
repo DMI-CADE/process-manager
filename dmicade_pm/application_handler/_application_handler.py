@@ -56,7 +56,12 @@ class DmicApplicationHandler:
 
         # Create process
         app_process = dmic_app_process_factory(app_id, app_config)
-        app_process.run(self._config_loader.apps_path)
+        try:
+            app_process.run(self._config_loader.apps_path)
+        except Exception as e:
+            logging.error(e)
+            return
+
         app_process.crash_event += self._get_crash_callback_function(app_id)
 
         self.running_apps[app_id] = app_process
