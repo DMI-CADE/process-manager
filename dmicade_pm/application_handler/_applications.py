@@ -1,6 +1,7 @@
 import subprocess
 import threading
 import logging
+import re
 
 from abc import ABC, abstractmethod
 from ..helper import DmicEvent, DmicException
@@ -11,6 +12,8 @@ class DmicApp(ABC):
 
     EXE = 'executable'
     MAME_ROM = 'mame_rom'
+    GODOT = 'godot'
+    UNITY = 'unity'
 
     def __init__(self, app_id, app_config):
         self.app_id = app_id
@@ -99,7 +102,7 @@ class DmicAppMameRom(DmicApp):
 
 
 class DmicAppExecutable(DmicApp):
-    """Calss for DmicApp type 'Executable'."""
+    """Class for DmicApp type 'Executable'."""
 
     def get_window_search_term(self):
         if 'exe' not in self.app_config:
@@ -122,6 +125,24 @@ class DmicAppExecutable(DmicApp):
         return subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
 
+class DmicAppGodot(DmicAppExecutable):
+    """Class for godot games."""
+
+    def get_window_search_term(self):
+        return 'godot'
+
+
+class DmicAppUnity(DmicAppExecutable):
+    """Class for unity games."""
+
+    def get_window_search_term(self):
+        term = super().get_window_search_term()
+        id_part_match = re.search(r"[a-ce-zA-CE-Z][a-zA-Z]{3,}", term)
+        if id_part_match:
+            term = id_part_match.group() + r'.*\.x86_64'
+        return term
+
+
 class DmicAppNotRunningException(DmicException):
     def __init__(self, app_id):
         self.app_id = app_id
@@ -138,6 +159,10 @@ def dmic_app_process_factory(app_id, app_config) -> DmicApp:
     try:
         if app_config['type'] == DmicApp.EXE:
             new_app_process = DmicAppExecutable(app_id, app_config)
+        elif app_config['type'] == DmicApp.GODOT:
+            new_app_process = DmicAppGodot(app_id, app_config)
+        elif app_config['type'] == DmicApp.UNITY:
+            new_app_process = DmicAppUnity(app_id, app_config)
         elif app_config['type'] == DmicApp.MAME_ROM:
             new_app_process = DmicAppMameRom(app_id, app_config)
         else:

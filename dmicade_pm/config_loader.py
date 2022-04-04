@@ -102,7 +102,7 @@ class DmicConfigLoader:
         try:
             req_props = [] # required properties
 
-            if config['type'] == 'executable':
+            if config['type'] in ['executable', 'godot', 'unity']:
                 req_props = ['type', 'exe']
             elif config['type'] == 'mame_rom':
                 req_props = ['type','command']
@@ -114,6 +114,20 @@ class DmicConfigLoader:
             for prop in req_props:
                 if prop not in config:
                     logging.warning(f'[CONFIG LOADER] Property "{prop}" missing in app config...')
+                    return False
+
+            # Make sure apps ID will not close UI.
+            if config['type'] == 'unity':
+                id_part_match = re.search(r"[a-ce-zA-CE-Z][a-zA-Z]{3,}", config['exe'].replace('.x86_64', ''))
+                if id_part_match:
+                    term = id_part_match.group() + r'.*\.x86_64'
+                    print(term)
+                    ui_intersect_match = re.search(term, 'DMI-CADE-UI.x86_64')
+                    print(ui_intersect_match)
+                    if ui_intersect_match:
+                        logging.warning(f'[CONFIG LOADER] Apps file name intersects with UI name ("DMI-CADE-UI.x86_64"): {ui_intersect_match}')
+                        return False
+                else:
                     return False
                 
         except KeyError:
