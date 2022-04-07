@@ -8,6 +8,7 @@ class DmicButtonController():
 
     def __init__(self, global_config, serial_connector:DmicSerialConnector):
         self.current_colors = ['000000' for i in range(12)]
+        self.system_btn_leds_state = '00000;'
 
         self._color_order = global_config['button_led_order']
         self._clear_queued = False
@@ -28,7 +29,7 @@ class DmicButtonController():
         self.current_colors = self.convert_color_data(color_data)
         logging.info(f"[BUTTON CONTROLLER] Apply Colors: {self.current_colors}")
 
-        str_data = ';'.join(self.order_color_data(self.current_colors)) + ';'
+        str_data = self.system_btn_leds_state + ';'.join(self.order_color_data(self.current_colors)) + ';'
         logging.debug(f"[BUTTON CONTROLLER] Send color data: '{str_data}'")
         self.serial_connector.write_data(str_data)
 
@@ -36,7 +37,8 @@ class DmicButtonController():
     def clear_colors(self):
         """Changes all color data do clear/black."""
 
-        self.change_colors('000000;'*12)
+        self.queue_clear = True
+        self.change_colors({})
 
 
     def queue_clear(self):
@@ -49,6 +51,7 @@ class DmicButtonController():
         color_data = None
         if self._clear_queued:
             color_data = ['000000' for i in range(12)]
+            self.system_btn_leds_state = self.system_btn_leds_state[0] + "0000;"
             self._clear_queued = False
         else:
             color_data = self.current_colors.copy()
@@ -64,6 +67,14 @@ class DmicButtonController():
 
                 # Skip keywords.
                 if key in ['ALL']:
+                    continue
+
+                # System btn LEDs
+                if key in ['P1Start', 'P2Start', 'P1Coin', 'P2Coin']:
+                    bool_pos = 1 + ['P1Start', 'P2Start', 'P1Coin', 'P2Coin'].index(key)
+                    new_leds_state = list(self.system_btn_leds_state)
+                    new_leds_state[bool_pos] = str( int(not not data[key]) ) # Use numerical value of set data.
+                    self.system_btn_leds_state = "".join(new_leds_state)
                     continue
 
                 if not re.match('^P[12][A-F]$', key):
