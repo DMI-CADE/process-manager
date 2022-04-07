@@ -44,6 +44,8 @@ class DmicConfigLoader:
         pm_config = dict()
 
         default_config_path = re.sub(r'[^/]+$', DEFAULT_CONFIG_FILE_NAME, __file__)
+        if os.name == 'nt':
+            default_config_path = re.sub(r'[^/\\]+$', DEFAULT_CONFIG_FILE_NAME, __file__)
         logging.debug(f'[CONFIG LOADER] {default_config_path=}')
 
         try:
