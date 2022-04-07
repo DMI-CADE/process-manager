@@ -3,6 +3,7 @@ import threading
 import time
 import math
 import subprocess
+import os
 
 
 class VolumeController():
@@ -29,6 +30,8 @@ class VolumeController():
         self._audio_level_goal = volume_perc
 
         set_volume_cmd = self.CMD_SET_VOLUME % self._audio_level + '%'
+        if os.name == 'nt':
+            return
         subprocess.run(set_volume_cmd, shell=True, stdout=subprocess.PIPE)
 
     def fade_volume(self, goal_perc, max_fade_duration):
@@ -67,7 +70,8 @@ class VolumeController():
                 # logging.debug(f'[VOLUME CONTROL] {self._audio_level=}')
 
                 set_volume_cmd = self.CMD_SET_VOLUME % self._audio_level + '%'
-                subprocess.Popen(set_volume_cmd, shell=True, stdout=subprocess.PIPE)
+                if os.name != 'nt':
+                    subprocess.Popen(set_volume_cmd, shell=True, stdout=subprocess.PIPE)
                 
                 time.sleep(self._fade_time_delta)
 
