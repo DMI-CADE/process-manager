@@ -14,7 +14,7 @@ class DmicButtonController():
         self._clear_queued = False
         self.serial_connector = serial_connector
 
-    def change_colors(self, color_data:any):
+    def change_colors(self, color_data:None|str|list|dict):
         """Connverts give color data and sends it to the connected serial connection."""
 
         # Special cases
@@ -26,13 +26,15 @@ class DmicButtonController():
             return
 
         # Convert, order and send data.
-        self.current_colors = self.convert_color_data(color_data)
+        self._update_color_data(color_data)
         logging.info(f"[BUTTON CONTROLLER] Apply Colors: {self.current_colors}")
 
         str_data = self.system_btn_leds_state + ';'.join(self.order_color_data(self.current_colors)) + ';'
         logging.debug(f"[BUTTON CONTROLLER] Send color data: '{str_data}'")
         self.serial_connector.write_data(str_data)
 
+    def queue_menu_button_state(self, is_on:bool):
+        self.system_btn_leds_state = str(int(is_on)) + self.system_btn_leds_state[1:]
 
     def clear_colors(self):
         """Changes all color data do clear/black."""
@@ -47,7 +49,7 @@ class DmicButtonController():
         self._clear_queued = True
 
 
-    def convert_color_data(self, data: any):
+    def _update_color_data(self, data:None|str|list|dict):
         color_data = None
         if self._clear_queued:
             color_data = ['000000' for i in range(12)]
@@ -90,7 +92,7 @@ class DmicButtonController():
 
                 color_data[pos] = value
 
-            return color_data
+            self.current_colors = color_data
 
         if type(data) is str:
 

@@ -105,6 +105,9 @@ class DmicProcessManager:
     def queue_clear_button_colors(self):
         self._button_controller.queue_clear()
 
+    def queue_menu_button_led_state(self, is_on:bool):
+        self._button_controller.queue_menu_button_state(is_on)
+
     # Following functions violate the state model... But it had to be done...
 
     def _adjust_volume_on_interaction(self, data):

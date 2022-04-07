@@ -82,6 +82,7 @@ class S_InMenu(DmicState):
         # TODO Focus menu
         c_set_timer_menu()
         c_send_to_ui(UI_MSG['activate_menu'])
+        c_queue_menu_button_led_state(False)
         c_set_menu_button_colors()
 
     def handle(self, task):
@@ -111,6 +112,7 @@ class S_InMenu(DmicState):
                     logging.warning(f'[STATE: INMENU] Could not focus app: {app_id}')
                     # TODO handle app not focused
 
+                c_queue_menu_button_led_state(True)
                 c_set_app_button_colors(app_id)
 
                 c_send_to_ui(UI_MSG['deactivate_menu'])
@@ -136,6 +138,8 @@ class S_Idle(DmicState):
         c_set_interaction_feedback(True)
         c_stop_timer()
         c_send_to_ui(UI_MSG['enter_idle'])
+        c_queue_menu_button_led_state(True)
+        c_change_button_colors({})
         c_change_button_colors({"RAINBOW": True})
 
     def handle(self, task):
@@ -176,6 +180,7 @@ class S_InGame(DmicState):
 
 class S_Sleep(DmicState):
     def enter(self):
+        c_queue_menu_button_led_state(False)
         c_clear_button_colors()
         c_enter_sleep()
 

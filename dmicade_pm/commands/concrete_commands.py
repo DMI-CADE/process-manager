@@ -177,6 +177,10 @@ def c_set_menu_button_colors():
     c_change_button_colors(color_config)
 
 
+def c_queue_menu_button_led_state(is_on:bool):
+    _PM.queue_menu_button_led_state(is_on)
+
+
 def c_clear_button_colors():
     c_button_colors_queue_clear()
     c_change_button_colors({})
