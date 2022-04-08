@@ -14,7 +14,7 @@ class DmicButtonController():
         self._clear_queued = False
         self.serial_connector = serial_connector
 
-    def change_colors(self, color_data:None|str|list|dict):
+    def change_colors(self, color_data:str|list|dict):
         """Connverts give color data and sends it to the connected serial connection."""
 
         # Special cases
@@ -49,7 +49,7 @@ class DmicButtonController():
         self._clear_queued = True
 
 
-    def _update_color_data(self, data:None|str|list|dict):
+    def _update_color_data(self, data:str|list|dict):
         color_data = None
         if self._clear_queued:
             color_data = ['000000' for i in range(12)]
