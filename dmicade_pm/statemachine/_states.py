@@ -135,15 +135,22 @@ class S_InMenu(DmicState):
 
 class S_Idle(DmicState):
     def enter(self):
+        self.waiting_for_interaction = True
         c_set_interaction_feedback(True)
         c_stop_timer()
         c_send_to_ui(UI_MSG['enter_idle'])
         c_queue_menu_button_led_state(True)
-        c_change_button_colors({})
+        c_clear_button_colors()
+        time.sleep(1)
         c_change_button_colors({"RAINBOW": True})
 
     def handle(self, task):
-        if task.type is DmicTaskType.INTERACTION:
+        if task.type is DmicTaskType.INTERACTION or task.type is DmicTaskType.CLOSE_APP:
+            if not self.waiting_for_interaction:
+                return
+
+            self.waiting_for_interaction = False
+
             c_change_state('inmenu')
             c_set_interaction_feedback(False)
             c_send_to_ui(UI_MSG['exit_idle'])
