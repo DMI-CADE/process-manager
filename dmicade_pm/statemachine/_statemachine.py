@@ -98,6 +98,10 @@ class DmicStateMachine:
     def _change_state(self, state_name: str):
         """Handles steps to change to the next state."""
 
+        # Only change state if state is different.
+        if self._current_state == self._state_pool.get_object(state_name):
+            return
+
         logging.debug('[STATEM] Exit state...')
         self._current_state.exit()
 
