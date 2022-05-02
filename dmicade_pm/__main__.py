@@ -22,6 +22,7 @@ def main():
 
     print(__import__('os').getcwd())
     logger = DmicLogging(parsed_args)
+    logger.delete_old_logs()
     logger.setup()
 
     try:
