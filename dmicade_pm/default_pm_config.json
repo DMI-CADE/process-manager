@@ -10,7 +10,7 @@
     "button_colors_menu": {"P1Start": 1, "P2Start": 1, "P1F": "070500"},
     "button_colors_app_default": {"ALL": "AAA", "P1D": "8DB", "P2A": "8DB"},
 
-    "sleep_time": "22:00",
+    "sleep_time": "20:00",
     "wake_time": "08:00",
     "----sleep_notification_interval": "900",
 
